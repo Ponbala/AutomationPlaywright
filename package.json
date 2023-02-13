@@ -16,6 +16,9 @@
   },
   "homepage": "https://github.com/Ponbala/AutomationPlaywright#readme",
   "devDependencies": {
-    "@playwright/test": "^1.30.0"
+    "@playwright/test": "^1.30.0",
+    "@reportportal/agent-js-playwright": "^5.0.8"
+  },
+  "dependencies": {
   }
 }
