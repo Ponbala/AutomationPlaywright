@@ -16,7 +16,13 @@ export class RegisterPage {
     }
 
     async clickContinue() {
-        await this.page.waitForSelector(this.continue);
+        await (await this.page.waitForSelector(this.continue)).waitForElementState("enabled");
         await this.page.locator(this.continue).click();
+    };
+
+    async fillRegistrationFieldValues(nameValue: string, postalCode: string) {
+        await this.page.locator(this.firstName).fill(nameValue);
+        await this.page.locator(this.lastName).fill(nameValue);
+        await this.page.locator(this.postalCode).fill(postalCode);
     };
 }

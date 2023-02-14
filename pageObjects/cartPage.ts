@@ -12,7 +12,7 @@ export class CartPage {
     }
 
     async clickCheckout() {
-        await this.page.waitForSelector(this.checkout);
-        await this.page.locator(this.checkout).click();
+        await (await this.page.waitForSelector(this.checkout)).waitForElementState("stable");
+        await this.page.locator(this.checkout).click({ force: true });
     };
 }

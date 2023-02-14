@@ -44,27 +44,27 @@ export default defineConfig({
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
   /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : undefined,
+  workers: process.env.CI ? 1 : 3,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: 'html',
-  // reporter: [['@reportportal/agent-js-playwright', RPconfig]],
+  // reporter: 'html',
+  reporter: [['@reportportal/agent-js-playwright', RPconfig]],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Maximum time each action such as `click()` can take. Defaults to 0 (no limit). */
     actionTimeout: 30000,
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: 'https://www.saucedemo.com/',
+    baseURL: 'https://www.saucedemo.com',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on',
+    // trace: 'on',
     // viewport: null,
     headless: false,
     video: 'on',
     screenshot: 'on',
     // browserName: 'chromium',
-    launchOptions: {
-      args: ["--start-maximized"]
-    }
+    // launchOptions: {
+    //   args: ["--start-maximized"]
+    // }
   },
 
   /* Configure projects for major browsers */
@@ -74,15 +74,15 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
     },
 
-    // {
-    //   name: 'firefox',
-    //   use: { ...devices['Desktop Firefox'] },
-    // },
+    {
+      name: 'firefox',
+      use: { ...devices['Desktop Firefox'] },
+    },
 
-    // {
-    //   name: 'webkit',
-    //   use: { ...devices['Desktop Safari'] },
-    // },
+    {
+      name: 'webkit',
+      use: { ...devices['Desktop Safari'] },
+    },
 
     /* Test against mobile viewports. */
     // {
