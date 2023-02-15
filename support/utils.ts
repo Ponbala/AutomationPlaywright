@@ -14,6 +14,5 @@ export class Utils {
       firefox.launch(),
       webkit.launch(),
     ]);
-    console.log(`Launched ${browsers.length} browsers in parallel`);
   }
 }

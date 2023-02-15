@@ -7,6 +7,8 @@ export class HomePage {
     readonly inventoryContainer: string;
     readonly remove: string;
     readonly itemsCountInCart: string;
+    readonly sortingDropdown: string;
+    readonly activeOption: string;
 
     constructor(page: Page) {
         this.page = page;
@@ -15,6 +17,8 @@ export class HomePage {
         this.shoppingCart = ".shopping_cart_link";
         this.inventoryContainer = "#inventory_container";
         this.itemsCountInCart = ".shopping_cart_badge";
+        this.sortingDropdown = ".product_sort_container";
+        this.activeOption = ".active_option";
     }
 
     async getBaseURL() {
@@ -61,4 +65,39 @@ export class HomePage {
     async getInventoryContainerElement() {
         return this.inventoryContainer;
     };
+
+    async clickSortDropdown() {
+        await this.page.locator(this.sortingDropdown).click();
+    }
+
+    async selectSortOption(optionValue: string) {
+        await this.page.locator(this.sortingDropdown).selectOption(optionValue);
+        return await this.getValueText(optionValue);
+    }
+
+    async getValueText(option: string) {
+        let selectedOption: string | null;
+        switch (option) {
+            case "az":
+                selectedOption = await this.getActiveOptionText();
+                console.log("The selected option is " + selectedOption + " filter");
+                return selectedOption;
+            case "za":
+                selectedOption = await this.getActiveOptionText();
+                console.log("The selected option is " + selectedOption + " filter");
+                return selectedOption;
+            case "lohi":
+                selectedOption = await this.getActiveOptionText();
+                console.log("The selected option is " + selectedOption + " filter");
+                return selectedOption;
+            case "hilo":
+                selectedOption = await this.getActiveOptionText();
+                console.log("The selected option is " + selectedOption + " filter");
+                return selectedOption;
+        }
+    }
+
+    async getActiveOptionText() {
+        return await this.page.locator(this.activeOption).textContent();
+    }
 }

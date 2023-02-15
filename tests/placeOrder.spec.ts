@@ -5,10 +5,19 @@ import { LoginPage, HomePage, CartPage, RegisterPage, CheckoutPage } from '../pa
 
 let loginPage: LoginPage, homePage: HomePage, cartPage: CartPage, registerPage: RegisterPage, checkoutPage: CheckoutPage, page: Page, utils: Utils;
 
+const optionText = [Constants.aToZ, Constants.zToA, Constants.lowToHigh, Constants.highToLow];
+
 enum Products {
   firstItem = "1",
   secondItem = "2",
   thirdItem = "3"
+}
+
+enum sortOption {
+  AtoZ = "az",
+  ZtoA = "za",
+  LowToHigh = "lohi",
+  HighToLow = "hilo"
 }
 
 test.beforeAll(async ({ browser }) => {
@@ -61,5 +70,16 @@ test.describe('Adding products and removing scenarios', () => {
     const removeCount = await homePage.getRemoveItemsCount();
     await homePage.removeItemsFromCart(removeCount);
     expect(await homePage.getItemsCountElement()).not.toBeVisible();
+  });
+
+  test('Sorting the products and asserting', async () => {
+    await loginPage.fillUsrNameAndPwd(Constants.stdUser, Constants.password);
+    await loginPage.clickLogin();
+    await homePage.clickSortDropdown();
+    for (const option of Object.values(sortOption)) {
+      const index = Object.values(sortOption).indexOf(option);
+      const sortedOption = await homePage.selectSortOption(option);
+      expect(sortedOption).toEqual(optionText[index]);
+    }
   });
 });
