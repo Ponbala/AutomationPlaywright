@@ -1,4 +1,8 @@
-import { Page } from "@playwright/test";
+import { Page, expect } from "@playwright/test";
+import{ LoginPage } from "../pageObjects/loginPage";
+import { TitleVerification } from "../support/constants.json";
+
+let loginPage: LoginPage;
 
 export class CheckoutPage {
     readonly page: Page;
@@ -9,6 +13,7 @@ export class CheckoutPage {
 
     constructor(page: Page) {
         this.page = page;
+        loginPage = new LoginPage(page);
         this.finish = '#finish';
         this.cancel = '#cancel';
         this.orderMsg = 'div.complete-text';
@@ -25,9 +30,13 @@ export class CheckoutPage {
         return await this.page.locator(this.orderMsg).textContent();
     }
 
-    async clickBackToHome() {
+    async clickBackToHomeAndLogout() {
         await (await this.page.waitForSelector(this.backToHome)).waitForElementState("stable");
         await this.page.getByRole('button', { name: 'Back Home' }).click();
+        const product = await loginPage.getTitleText();
+        expect(product).toEqual(TitleVerification.productsPageTitle);
+        await loginPage.logout();
+        expect(this.page.locator(loginPage.loginContainer)).toBeVisible();
     }
 
     async clickFinish() {

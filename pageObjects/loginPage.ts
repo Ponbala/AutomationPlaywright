@@ -1,7 +1,4 @@
 import { Page } from "@playwright/test";
-import { HomePage } from "./homePage";
-
-let homePage: HomePage;
 
 export class LoginPage {
     readonly page: Page;
@@ -16,15 +13,14 @@ export class LoginPage {
 
     constructor(page: Page) {
         this.page = page;
-        homePage = new HomePage(this.page);
         this.userName = '#user-name';
         this.password = '#password';
         this.loginButton = '#login-button';
-        this.title = '.title';
+        this.title = '#header_container .title';
         this.menu = '#react-burger-menu-btn';
         this.logoutEle = '#logout_sidebar_link';
         this.loginContainer = '.login_wrapper-inner';
-        this.errorMsg = 'h3';
+        this.errorMsg = '.error-message-container [data-test="error"]';
     }
 
     async getUserNameElement() {
@@ -37,10 +33,11 @@ export class LoginPage {
         return this.password;
     };
 
-    async fillUsrNameAndPwd(userName: string, password: string) {
+    async fillUsrNameAndPwdAndLogin(userName: string, password: string) {
         let getUserNameEle = await this.getUserNameElement();
         await this.page.locator(getUserNameEle).fill(userName);
         await this.page.locator(await this.getPasswordElement()).fill(password);
+        await this.clickLogin();
     }
 
     async clickLogin() {

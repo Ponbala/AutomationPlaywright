@@ -1,0 +1,32 @@
+{
+    "Credentials": {
+        "stdUser": "standard_user",
+        "password": "secret_sauce",
+        "lockedOutUser": "locked_out_user",
+        "problemUser": "problem_user",
+        "perfGlitchUser": "performance_glitch_user",
+        "wrongUsername": "standard_us",
+        "wrongPassword": "secret_sau"
+    },
+    "TitleVerification": {
+        "swagLabsTitle": "Swag Labs",
+        "productsPageTitle": "Products"
+    },
+    "Registration": {
+        "firstName": "Alan",
+        "lastName": "Jose",
+        "postalCode": "560035"
+    },
+    "SortOption": {
+        "aToZ": "Name (A to Z)",
+        "zToA": "Name (Z to A)",
+        "lowToHigh": "Price (low to high)",
+        "highToLow": "Price (high to low)"
+    },
+    "ErrorMsg": {
+        "wrongUsernameOrPwdErrorMsg": "Epic sadface: Username and password do not match any user in this service",
+        "lockedUserErrorMsg": "Epic sadface: Sorry, this user has been locked out.",
+        "lastNameErrorMsg": "Error: Last Name is required",
+        "orderSuccessMsg": "Your order has been dispatched, and will arrive just as fast as the pony can get there!"
+    }
+}

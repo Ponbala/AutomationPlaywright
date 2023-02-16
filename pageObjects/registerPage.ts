@@ -1,4 +1,7 @@
 import { Page } from "@playwright/test";
+import { CheckoutPage } from '../pageObjects/checkoutPage';
+
+let checkoutPage: CheckoutPage;
 
 export class RegisterPage {
     readonly page: Page;
@@ -9,6 +12,7 @@ export class RegisterPage {
 
     constructor(page: Page) {
         this.page = page;
+        checkoutPage = new CheckoutPage(page);
         this.firstName = '#first-name';
         this.lastName = '#last-name';
         this.postalCode = '#postal-code';
@@ -20,9 +24,10 @@ export class RegisterPage {
         await this.page.locator(this.continue).click();
     };
 
-    async fillRegistrationFieldValues(nameValue: string, postalCode: string) {
-        await this.page.locator(this.firstName).fill(nameValue);
-        await this.page.locator(this.lastName).fill(nameValue);
+    async fillRegistrationFieldValues(firstName: string, lastName: string, postalCode: string) {
+        await this.page.locator(this.firstName).fill(firstName);
+        await this.page.locator(this.lastName).fill(lastName);
         await this.page.locator(this.postalCode).fill(postalCode);
+        await this.clickContinue();
     };
 }

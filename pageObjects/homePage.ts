@@ -1,4 +1,9 @@
-import { Page } from "@playwright/test";
+import { Page, expect } from "@playwright/test";
+import { Registration } from '../support/constants.json';
+import { CartPage } from "../pageObjects/cartPage";
+import { RegisterPage } from "../pageObjects/registerPage";
+
+let cartPage: CartPage, registerPage: RegisterPage;
 
 export class HomePage {
     readonly page: Page;
@@ -12,6 +17,8 @@ export class HomePage {
 
     constructor(page: Page) {
         this.page = page;
+        cartPage = new CartPage(page);
+        registerPage = new RegisterPage(page);
         this.addToCart = "Add to cart";
         this.remove = "Remove";
         this.shoppingCart = ".shopping_cart_link";
@@ -57,9 +64,12 @@ export class HomePage {
         return await (await this.getItemsCountElement()).textContent();
     }
 
-    async clickShoppingCart() {
+    async clickShoppingCartAndFillRegistrationValues() {
         await (await this.page.waitForSelector(this.shoppingCart)).waitForElementState("stable");
         await this.page.locator(this.shoppingCart).click({ force: true });
+        expect(this.page.locator(cartPage.cartContainer)).toBeVisible();
+        await cartPage.clickCheckout();
+        await registerPage.fillRegistrationFieldValues(Registration.firstName, Registration.lastName, Registration.postalCode);
     };
 
     async getInventoryContainerElement() {
@@ -70,7 +80,7 @@ export class HomePage {
         await this.page.locator(this.sortingDropdown).click();
     }
 
-    async selectSortOption(optionValue: string) {
+    async selectSortOptionAndGetValue(optionValue: string) {
         await this.page.locator(this.sortingDropdown).selectOption(optionValue);
         return await this.getValueText(optionValue);
     }
@@ -99,5 +109,13 @@ export class HomePage {
 
     async getActiveOptionText() {
         return await this.page.locator(this.activeOption).textContent();
+    }
+
+    async sortAllOptions(values: any, optionText: any) {
+        for (const option of values) {
+            const index = values.indexOf(option);
+            const sortedOption = await this.selectSortOptionAndGetValue(option);
+            expect(sortedOption).toEqual(optionText[index]);
+        }
     }
 }

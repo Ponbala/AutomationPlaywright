@@ -21,9 +21,9 @@ export default defineConfig({
   testDir: './tests',
   timeout: 60 * 60 * 1000,
   expect: {
-    timeout: 5000
+    timeout: 10000
   },
-  fullyParallel: false,
+  // fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : 3,
@@ -33,32 +33,41 @@ export default defineConfig({
     actionTimeout: 30000,
     baseURL: 'https://www.saucedemo.com',
     trace: 'on',
-    // viewport: null,
     headless: false,
     video: 'on',
-    screenshot: 'on',
-    // browserName: 'chromium',
-    // launchOptions: {
-    //   args: ["--start-maximized"]
-    // }
+    screenshot: 'on'
   },
 
   /* Configure projects for major browsers */
+
   projects: [
     {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      name: "Chromium",
+      // fullyParallel: true,
+      use: {
+        browserName: "chromium",
+        viewport: null,
+        launchOptions: {
+          args: ["--start-maximized"]
+        }
+      },
     },
-
     {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
+      name: "Firefox",
+      fullyParallel: true,
+      use: {
+        browserName: "firefox",
+        viewport: { width: 1366, height: 667 }
+      }
     },
-
     {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
+      name: "Webkit",
+      fullyParallel: true,
+      use: {
+        browserName: "webkit",
+        viewport: { width: 1366, height: 667 }
+      }
     },
-  ],
-  outputDir: 'test-results/',
+  ]
+  // outputDir: 'test-results/',
 });
