@@ -1,9 +1,11 @@
 import { test, expect, Page } from '@playwright/test';
 import Constants from '../support/constants.json';
 import { Utils } from '../support/utils';
+import { TestData } from '../testData/testData';
 import { LoginPage, HomePage, CartPage, RegisterPage, CheckoutPage } from '../pageObjects';
+import ENV from '../support/env';
 
-let loginPage: LoginPage, homePage: HomePage, cartPage: CartPage, registerPage: RegisterPage, checkoutPage: CheckoutPage, page: Page, utils: Utils;
+let loginPage: LoginPage, homePage: HomePage, cartPage: CartPage, registerPage: RegisterPage, checkoutPage: CheckoutPage, testData: TestData, page: Page, utils: Utils;
 
 const optionText = [Constants.SortOption.aToZ, Constants.SortOption.zToA, Constants.SortOption.lowToHigh, Constants.SortOption.highToLow];
 
@@ -31,6 +33,7 @@ test.beforeAll(async ({ browser }) => {
   cartPage = new CartPage(page);
   registerPage = new RegisterPage(page);
   checkoutPage = new CheckoutPage(page);
+  testData = new TestData(page);
 });
 
 test.afterAll(async () => {
@@ -41,7 +44,8 @@ test.describe('Adding products and removing scenarios', () => {
   test.beforeEach(async () => {
     await homePage.getBaseURL();
     await expect(page).toHaveTitle(Constants.TitleVerification.swagLabsTitle);
-    await loginPage.fillUsrNameAndPwdAndLogin(Constants.Credentials.stdUser, Constants.Credentials.password);
+    let pass = await testData.encodeDecodePassword();
+    await loginPage.fillUsrNameAndPwdAndLogin(ENV.USERNAME, pass);
   });
 
   test('Adding the product to cart and placing the order with standard User', async () => {

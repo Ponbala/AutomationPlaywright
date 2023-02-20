@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "test": "npx playwright test"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Ponbala/AutomationPlaywright.git"
@@ -20,5 +22,7 @@
     "@reportportal/agent-js-playwright": "^5.0.8"
   },
   "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.0.3"
   }
 }
