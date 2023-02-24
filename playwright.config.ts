@@ -24,7 +24,7 @@ const RPconfig = {
 
 export default defineConfig({
   testDir: './tests',
-  testMatch: ["tests/placeOrder.spec.ts"],
+  testMatch: ["tests/*.spec.ts"],
   timeout: 60 * 60 * 1000,
   expect: {
     timeout: 10000
@@ -33,7 +33,7 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : 3,
-  reporter: [["html", {open: 'always'}], ['list']],
+  reporter: [["html", { open: 'always' }]],
   // reporter: process.env.CI ? 'github' : 'list',
   // reporter: [['@reportportal/agent-js-playwright', RPconfig]],
   use: {
@@ -42,7 +42,7 @@ export default defineConfig({
     headless: false,
     // trace: 'on',
     // video: "on",
-    screenshot: "on"
+    // screenshot: "on"
   },
 
   /* Configure projects for major browsers */

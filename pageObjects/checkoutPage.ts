@@ -36,7 +36,8 @@ export class CheckoutPage {
         const product = await loginPage.getTitleText();
         expect(product).toEqual(TitleVerification.productsPageTitle);
         await loginPage.logout();
-        expect(this.page.locator(loginPage.loginContainer)).toBeVisible();
+        let container = this.page.locator(loginPage.loginContainer);
+        await expect(container).toBeVisible();
     }
 
     async clickFinish() {

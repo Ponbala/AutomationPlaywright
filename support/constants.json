@@ -17,6 +17,24 @@
         "lastName": "Jose",
         "postalCode": "560035"
     },
+    "SortingOptions": [
+        {
+            "sortOption": "Name (A to Z)",
+            "optionKey": "az"
+        },
+        {
+            "sortOption": "Name (Z to A)",
+            "optionKey": "za"
+        },
+        {
+            "sortOption": "Price (low to high)",
+            "optionKey": "lohi"
+        },
+        {
+            "sortOption": "Price (high to low)",
+            "optionKey": "hilo"
+        }
+    ],
     "SortOption": {
         "aToZ": "Name (A to Z)",
         "zToA": "Name (Z to A)",

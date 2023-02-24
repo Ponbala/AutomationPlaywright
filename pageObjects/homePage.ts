@@ -111,6 +111,11 @@ export class HomePage {
         return await this.page.locator(this.activeOption).textContent();
     }
 
+    async sortAllOptionsAndVerify(optionKey: any, valueToVerify: string) {
+        let selectedOption = await this.selectSortOptionAndGetValue(optionKey);
+        expect(selectedOption).toEqual(valueToVerify);
+    }
+
     async sortAllOptions(values: any, optionText: any) {
         for (const option of values) {
             const index = values.indexOf(option);
