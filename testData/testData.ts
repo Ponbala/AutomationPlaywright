@@ -10,7 +10,7 @@ export class TestData {
     }
 
     async encodeDecodePassword() {
-        const encodedPassword = btoa(ENV.PASSWORD);
+        const encodedPassword = Buffer.from(ENV.PASSWORD, 'utf-8').toString('base64');
         const decodedPassword = Buffer.from(encodedPassword, 'base64').toString('utf-8');
         return decodedPassword;
     }

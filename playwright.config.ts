@@ -9,7 +9,7 @@ const RPconfig = {
   token: '8be9d121-af6a-44da-be10-61cb0e73fe10',
   endpoint: 'https://demo.reportportal.io/api/v1',
   project: 'ponbala_personal',
-  launch: 'Playwright test',
+  launch: 'Playwright SauceDemo',
   attributes: [
     {
       key: 'key',
@@ -19,12 +19,12 @@ const RPconfig = {
       value: 'value',
     },
   ],
-  description: 'Playwright Sample',
+  description: 'Playwright Practice',
 };
 
 export default defineConfig({
   testDir: './tests',
-  testMatch: ["tests/*.spec.ts"],
+  testMatch: ["tests/placeOrder.spec.ts"],
   timeout: 60 * 60 * 1000,
   expect: {
     timeout: 10000
@@ -33,16 +33,16 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : 3,
-  reporter: [["html", { open: 'always' }]],
+  // reporter: [["html", { open: 'always' }]],
   // reporter: process.env.CI ? 'github' : 'list',
-  // reporter: [['@reportportal/agent-js-playwright', RPconfig]],
+  reporter: [["list"],['@reportportal/agent-js-playwright', RPconfig]],
   use: {
     actionTimeout: 30000,
     baseURL: 'https://www.saucedemo.com',
     headless: false,
-    // trace: 'on',
-    // video: "on",
-    // screenshot: "on"
+    // trace: 'retain-on-failure',
+    // video: "retain-on-failure",
+    // screenshot: "only-on-failure"
   },
 
   /* Configure projects for major browsers */

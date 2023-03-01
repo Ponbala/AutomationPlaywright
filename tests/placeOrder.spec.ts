@@ -42,27 +42,40 @@ test.afterAll(async () => {
 });
 
 test.describe('Adding products and removing scenarios', () => {
+  test.afterEach(async () => {
+    if (test.info().status === 'failed') {
+      await test.info().attach("Failure Screenshot", { body: await page.screenshot(), contentType: "image/png" });
+    }
+  });
+
   // test.afterEach(async () => {
-  //   if (test.info().status === 'failed') {
-      //1st way
-      // const screenshot = await page.screenshot({ fullPage: true, type: 'png' });
-      // const base64Text = screenshot.toString('base64');
-      // const bufferScreenshot = Buffer.from(base64Text, 'base64');
-      // console.log(await page.screenshot({fullPage: true, type: 'png'}));
-      // await page.screenshot({fullPage: true, type: 'png'});
-   
-      //2nd way
-      // await test.info().attach('screenshot', { body: Buffer.from(base64Text, 'base64'), contentType: 'image/png' });
+  // if (test.info().status === 'failed') {
+  //1st way
+  // const screenshot = await page.screenshot({ fullPage: true, type: 'png' });
+  // const base64Text = Buffer.from(screenshot).toString('base64');
+  // console.log(`ss: ${atob(base64Text).valueOf()}`);
 
-      //3rd way
-      // const file = test.info().outputPath('screenshot.png');
-      // await fs.promises.writeFile(file, Buffer.from(file, 'base64'));
-      // await test.info().attach('my screenshot', { path: file });
+  //2nd way
+  // const screenshot = await page.screenshot();
+  // const encodedScreenshot = Buffer.from(screenshot).toString('base64');
+  // const bufferedScreenshot = Buffer.from(encodedScreenshot, 'base64');
+  // fs.writeFileSync('screenshot.png', bufferedScreenshot);
+  // console.log("ss",await page.screenshot());
+  // const image = await page.screenshot({path: 'screenshot.png', fullPage: true, type: 'png'});
+  // console.log(`Screenshot: ${image.toString('base64')}`);
 
-      // 4th way
-   // const asciiArt = await terminalImage.buffer(bufferScreenshot, { width: '50%' });
-      // console.log(`\n\nFailure Screenshot (${test.info().status}):\n\n${asciiArt}`);
-  //   }
+  //3rd way
+  // await test.info().attach('screenshot', { body: encodedScreenshot, contentType: 'image/png' });
+
+  //4th way
+  // const file = test.info().outputPath('screenshot.png');
+  // await fs.promises.writeFile(file, Buffer.from(file, 'base64'));
+  // await test.info().attach('my screenshot', { path: file });
+
+  // 5th way
+  // const asciiArt = await terminalImage.buffer(bufferScreenshot, { width: '50%' });
+  // console.log(`\n\nFailure Screenshot (${test.info().status}):\n\n${asciiArt}`);
+  // }
   // });
 
   test('Adding the product to cart and placing the order with standard User', async () => {

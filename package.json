@@ -23,7 +23,6 @@
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
-    "dotenv": "^16.0.3",
-    "terminal-image": "^2.0.0"
+    "dotenv": "^16.0.3"
   }
 }
