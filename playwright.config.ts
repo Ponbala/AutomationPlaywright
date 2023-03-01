@@ -38,11 +38,11 @@ export default defineConfig({
   // reporter: [['@reportportal/agent-js-playwright', RPconfig]],
   use: {
     actionTimeout: 30000,
-    baseURL: 'https://www.saucedemo.com',
+    baseURL: 'https://opensource-demo.orangehrmlive.com',
     headless: false,
-    // trace: 'on',
+    trace: 'on',
     // video: "on",
-    // screenshot: "on"
+    screenshot: "on"
   },
 
   /* Configure projects for major browsers */

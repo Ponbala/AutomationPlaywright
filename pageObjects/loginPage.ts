@@ -5,22 +5,18 @@ export class LoginPage {
     readonly userName: string;
     readonly password: string;
     readonly loginButton: string;
-    readonly title: string;
-    readonly menu: string;
-    readonly logoutEle: string;
-    readonly loginContainer: string;
-    readonly errorMsg: string;
+    readonly myInfo: string;
 
     constructor(page: Page) {
         this.page = page;
-        this.userName = '#user-name';
-        this.password = '#password';
-        this.loginButton = '#login-button';
-        this.title = '#header_container .title';
-        this.menu = '#react-burger-menu-btn';
-        this.logoutEle = '#logout_sidebar_link';
-        this.loginContainer = '.login_wrapper-inner';
-        this.errorMsg = '.error-message-container [data-test="error"]';
+        this.userName = '[name="username"]';
+        this.password = '[name="password"]';
+        this.loginButton = '[type="submit"]';
+        this.myInfo = '//span[text()="My Info"]';
+    }
+
+    async getBaseURL() {
+        await this.page.goto('/');
     }
 
     async getUserNameElement() {
@@ -45,28 +41,8 @@ export class LoginPage {
         await this.page.locator(this.loginButton).click();
     };
 
-    async getTitleText() {
-        await this.page.waitForSelector(this.title);
-        return await this.page.locator(this.title).textContent();
+    async clickMyInfoMenu() {
+        await this.page.waitForSelector(this.myInfo);
+        await this.page.getByRole('link', { name: 'My Info' }).click();
     };
-
-    async clickMenu() {
-        await this.page.waitForSelector(this.menu);
-        await this.page.locator(this.menu).click();
-    };
-
-    async clickLogout() {
-        await (await this.page.waitForSelector(this.logoutEle)).waitForElementState("enabled");
-        await this.page.locator(this.logoutEle).click();
-    };
-
-    async logout() {
-        await this.clickMenu();
-        await this.clickLogout();
-    };
-
-    async getErrorMsg() {
-        await this.page.waitForSelector(this.errorMsg);
-        return await this.page.locator(this.errorMsg).textContent();
-    }
 }
