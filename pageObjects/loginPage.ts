@@ -12,7 +12,6 @@ export class LoginPage {
         this.userName = '[name="username"]';
         this.password = '[name="password"]';
         this.loginButton = '[type="submit"]';
-        this.myInfo = '//span[text()="My Info"]';
     }
 
     async getBaseURL() {
@@ -39,10 +38,5 @@ export class LoginPage {
     async clickLogin() {
         await this.page.waitForSelector(this.loginButton);
         await this.page.locator(this.loginButton).click();
-    };
-
-    async clickMyInfoMenu() {
-        await this.page.waitForSelector(this.myInfo);
-        await this.page.getByRole('link', { name: 'My Info' }).click();
     };
 }

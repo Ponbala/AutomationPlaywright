@@ -2,18 +2,10 @@ import { test, expect, Page } from '@playwright/test';
 import Constants from '../support/constants.json';
 import { Utils } from '../support/utils';
 import { TestData } from '../testData/testData';
-import { LoginPage, HomePage } from '../pageObjects';
+import { LoginPage, HomePage, MyInfoPage } from '../pageObjects';
 import ENV from '../support/env';
 
-let loginPage: LoginPage, homePage: HomePage, testData: TestData, page: Page, utils: Utils;
-
-enum Products {
-  firstItem = "1",
-  secondItem = "2",
-  thirdItem = "3"
-}
-
-const itemsToAddCount = Object.keys(Products).length;
+let loginPage: LoginPage, homePage: HomePage, myInfoPage: MyInfoPage, testData: TestData, page: Page, utils: Utils;
 
 test.beforeAll(async ({ browser }) => {
   page = await browser.newPage();
@@ -21,88 +13,113 @@ test.beforeAll(async ({ browser }) => {
   // await utils.launchBrowsers();
   loginPage = new LoginPage(page);
   homePage = new HomePage(page);
+  myInfoPage = new MyInfoPage(page);
   testData = new TestData(page);
 });
 
-test.beforeEach(async () => {
+test.beforeAll(async () => {
   await loginPage.getBaseURL();
   await expect(page).toHaveURL(/.*login/);
   let pass = await testData.encodeDecodePassword();
   await loginPage.fillUsrNameAndPwdAndLogin(ENV.USERNAME, pass);
+  await expect(page).toHaveURL(/.*dashboard/);
+  await page.waitForSelector(homePage.dashboardGrid);
 });
 
 test.afterAll(async () => {
   await page.close();
 });
 
-test.describe('Adding products and removing scenarios', () => {
-  test('Adding the product to cart and placing the order with standard User', async () => {
-    await expect(page).toHaveURL(/.*dashboard/);
-    await page.waitForSelector('div.orangehrm-dashboard-grid');
-    await loginPage.clickMyInfoMenu();
-    await page.waitForSelector('div.orangehrm-background-container');
+test.describe('Filling Personal details', () => {
+  test('Filling the names section', async () => {
+    await homePage.clickMyInfoMenu();
+    await myInfoPage.clearTextBoxValues(myInfoPage.firstName);
+    await myInfoPage.fillTextBoxValues(myInfoPage.firstName, 'Pon');
+    await myInfoPage.clearTextBoxValues(myInfoPage.middleName);
+    await myInfoPage.fillTextBoxValues(myInfoPage.middleName, 'L');
+    await myInfoPage.clearTextBoxValues(myInfoPage.lastName);
+    await myInfoPage.fillTextBoxValues(myInfoPage.lastName, 'Balan');
+    await myInfoPage.clearTextBoxValues(myInfoPage.nickName);
+    await myInfoPage.fillTextBoxValues(myInfoPage.nickName, 'Agilesh');
+  });
 
-    await page.locator('input.orangehrm-firstname').fill('');
-    await page.locator('input.orangehrm-firstname').type('Pon');
+  test('Filling the Id section', async () => {
+    await myInfoPage.clearTextBoxValues(myInfoPage.employeeId);
+    await myInfoPage.fillTextBoxValues(myInfoPage.employeeId, '10');
+    await myInfoPage.clearTextBoxValues(myInfoPage.otherId);
+    await myInfoPage.fillTextBoxValues(myInfoPage.otherId, '11');
+    await myInfoPage.clearTextBoxValues(myInfoPage.driverLicenseNumber);
+    await myInfoPage.fillTextBoxValues(myInfoPage.driverLicenseNumber, '123');
+    await myInfoPage.fillDateValue(myInfoPage.licenseExpiryDate, '2030-11-25');
+    await myInfoPage.clearTextBoxValues(myInfoPage.ssnNumber);
+    await myInfoPage.fillTextBoxValues(myInfoPage.ssnNumber, '110');
+    await myInfoPage.clearTextBoxValues(myInfoPage.ssnNumber);
+    await myInfoPage.fillTextBoxValues(myInfoPage.ssnNumber, '111');
+  });
 
-    await page.locator('input.orangehrm-middlename').fill('');
-    await page.locator('input.orangehrm-middlename').type('Balan');
+  test('Filling the personal details section', async () => {
+    await myInfoPage.click(myInfoPage.nationality);
+    await myInfoPage.selecDropdownOption('option', 'Indian');
+    await myInfoPage.click(myInfoPage.maritalStatus);
+    await myInfoPage.selecDropdownOption('option', 'Single');
+    await myInfoPage.fillDateValue(myInfoPage.dateofBirth, '2000-12-26');
+    await myInfoPage.click(myInfoPage.gender);
+    await myInfoPage.fillTextBoxValues(myInfoPage.militaryService, 'No');
+    await myInfoPage.click(myInfoPage.smoker);
+    await myInfoPage.clickSave(myInfoPage.save, 0);
+    expect(await myInfoPage.getToastMessage()).toEqual(Constants.sucessMsg.successfulUpdatedMsg);
+    await myInfoPage.clickCloseIcon();
+    await myInfoPage.click(myInfoPage.bloodType);
+    await myInfoPage.selecDropdownOption('option', 'A+');
+    await myInfoPage.clickSave(myInfoPage.save, 1);
+    expect(await myInfoPage.getToastMessage()).toEqual(Constants.sucessMsg.successfulUpdatedMsg);
+    await myInfoPage.clickCloseIcon();
+  });
 
-    await page.locator('input.orangehrm-lastname').fill('');
-    await page.locator('input.orangehrm-lastname').type('L');
+  test('Filling the personal details and verifying cancel button', async () => {
+    await myInfoPage.click(myInfoPage.addButton);
+    await page.waitForSelector(myInfoPage.browseButton);
+    await myInfoPage.click(myInfoPage.browseButton);
+    await myInfoPage.uploadFile('uploadTextFile.txt');
+    await myInfoPage.fillTextBoxValues(myInfoPage.commentBox, Constants.fillText.comment);
+    await myInfoPage.click(myInfoPage.cancel);
+    await page.waitForSelector(myInfoPage.noRecordsText);
+  });
 
-    await page.locator(`//label[text()='Nickname']/../..//div/input`).fill('');
-    await page.locator(`//label[text()='Nickname']/../..//div/input`).type('Agilesh');
-    await page.locator('input.orangehrm-lastname').fill('');
-    await page.locator(`//label[text()='Employee Id']/../..//div/input`).type('10');
-    await page.locator('input.orangehrm-lastname').fill('');
-    await page.locator(`//label[text()='Other Id']/../..//div/input`).type('11');
-    await page.locator('input.orangehrm-lastname').fill('');
-    await page.locator(`//label[text()="Driver's License Number"]/../..//div/input`).type('11');
-    await page.locator(`//label[text()='License Expiry Date']/../..//div/input`).fill('2030-11-25');
-    await page.locator('input.orangehrm-lastname').fill('');
-    await page.locator(`//label[text()='SSN Number']/../..//div/input`).type('112');
-    await page.locator('input.orangehrm-lastname').fill('');
-    await page.locator(`//label[text()='SIN Number']/../..//div/input`).type('113');
-    await page.locator(`//label[text()='Nationality']/../../..//div[@class='oxd-select-text--after']`).click();
-    await page.getByRole('option', { name: 'Indian' }).getByText('Indian').click();
-    await page.locator(`//label[text()='Marital Status']/../../..//div[@class='oxd-select-text--after']`).click();
-    await page.getByRole('option', { name: 'Single' }).getByText('Single').click();
-    await page.locator(`//label[text()='Date of Birth']/../..//div/input`).fill('2000-11-25');
-    await page.locator('//label[text()="Gender"]/../../..//div[@class="oxd-radio-wrapper"]/label/input[@value="1"]').click({ force: true });
-    await page.locator(`//label[text()='Military Service']/../..//div/input`).type('No');
+  test('Filling the personal details and verifying save button', async () => {
+    await myInfoPage.click(myInfoPage.addButton);
+    await page.waitForSelector(myInfoPage.browseButton);
+    // await page.setInputFiles(".oxd-file-input",'./uploadTextFile.txt');
+    page.on("filechooser", async (filechooser) => {
+      await filechooser.setFiles('uploadTextFile.txt')
+    });
+    await myInfoPage.click(myInfoPage.browseButton);
+    await myInfoPage.fillTextBoxValues(myInfoPage.commentBox, Constants.fillText.comment);
+    await page.locator(myInfoPage.save).last().click();
+    expect(await myInfoPage.getToastMessage()).toEqual(Constants.sucessMsg.sucessfulSavedMsg);
+    await myInfoPage.clickCloseIcon();
+    expect(page.locator(myInfoPage.table)).toBeVisible();
+    await page.waitForTimeout(4000);
+  });
 
-    await page.locator(`//label[text()='Smoker']/../../..//div/label/input[@type='checkbox']`).click({ force: true });
-    await page.locator('button.oxd-button--medium').first().click();
-    let successMessage = await page.locator('p.oxd-text--toast-message').textContent();
-    expect(successMessage).toEqual("Successfully Updated");
-    await page.locator('.oxd-toast-close-container').click();
+  test('Uploading the document and checking the checkbox and performing delete operation', async () => {
+    // const record = await page.locator('.orangehrm-horizontal-padding .oxd-text.oxd-text--span').textContent();
+    // expect(record).toContain("Record Found");
+    await myInfoPage.click(myInfoPage.attachmentCheckBox);
+    await (await page.waitForSelector(myInfoPage.deleteSelectedButton)).waitForElementState("stable");
+    expect(page.locator(myInfoPage.deleteSelectedButton)).toBeVisible();
 
-    await page.locator(`//label[text()='Blood Type']/../../../..//div/i`).click();
-    await page.getByRole('option', { name: 'A+' }).getByText('A+').click();
-    await page.locator('button.oxd-button--medium').nth(1).click();
-    successMessage = await page.locator('p.oxd-text--toast-message').textContent();
-    expect(successMessage).toEqual("Successfully Updated");
-    await page.locator('.oxd-toast-close-container').click();
-
-
-    await page.locator('button.oxd-button--text').click();
-    await page.waitForSelector('//div[text()="Browse"]/../../..');
-    await page.locator('//div[text()="Browse"]').click();
-    await page.locator('.oxd-file-input').setInputFiles('uploadTextFile.txt');
-    await page.locator('textarea.oxd-textarea').fill('File has been uploaded successfully');
-    await page.locator('.oxd-form-actions button[type="button"]').click();
-    await page.waitForSelector('.orangehrm-horizontal-padding .oxd-text.oxd-text--span');
-
-    await page.locator('button.oxd-button--text').click();
-    await page.waitForSelector('//div[text()="Browse"]/../../..');
-    await page.locator('//div[text()="Browse"]').click();
-    await page.locator('.oxd-file-input').setInputFiles('uploadTextFile.txt');
-    await page.locator('textarea.oxd-textarea').fill('File has been uploaded successfully');
-    await page.locator('.oxd-form-actions button[type="submit"]').last().click();
-    successMessage = await page.locator('p.oxd-text--toast-message').textContent();
-    expect(successMessage).toEqual("Successfully Saved");
-    await page.locator('.oxd-toast-close-container').click();
-    // await page.pause();
+    await myInfoPage.click(myInfoPage.attachmentCheckBox);
+    expect(page.locator(myInfoPage.deleteSelectedButton)).not.toBeVisible();
+    await page.locator(myInfoPage.deleteIcon).first().click();
+    await page.waitForSelector(myInfoPage.confirmationPopup);
+    expect(await page.locator(myInfoPage.popupText).textContent()).toEqual(Constants.popupText.text);
+    await page.getByRole('button', { name: /^\s*No, Cancel\s*$/i }).click();
+    expect(page.locator(myInfoPage.attachemtRow).first()).toBeVisible();
+    console.log("cancel passed");
+    // await page.locator(myInfoPage.deleteIcon).first().click();
+    // await page.waitForSelector(myInfoPage.confirmationPopup);
+    // await page.getByRole('button', { name: /^\s*Yes, Delete\s*$/i }).click();
+    // expect(page.locator(myInfoPage.attachemtRow).first()).not.toBeVisible();
   });
 });
