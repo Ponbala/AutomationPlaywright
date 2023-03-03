@@ -12,6 +12,7 @@
     },
     "sucessMsg": {
         "successfulUpdatedMsg": "Successfully Updated",
+        "successfulDeletedMsg": "Successfully Deleted",
         "sucessfulSavedMsg": "Successfully Saved"
     },
     "fillText": {
@@ -19,5 +20,6 @@
     },
     "popupText": {
         "text": "The selected record will be permanently deleted. Are you sure you want to continue?"
-    }
+    },
+    "noRecordsText": "No Records Found"
 }

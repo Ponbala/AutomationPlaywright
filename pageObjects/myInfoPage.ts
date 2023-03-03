@@ -35,6 +35,9 @@ export class MyInfoPage {
     readonly popupText: string;
     readonly attachemtRow: string;
     readonly table: string;
+    readonly popupDeleteButton: string;
+    readonly contactDetailsLocators: any;
+    contactDetails: string;
 
     constructor(page: Page) {
         this.page = page;
@@ -71,11 +74,31 @@ export class MyInfoPage {
         this.popupText = 'p.oxd-text--card-body';
         this.attachemtRow = 'div.oxd-table-card';
         this.table = '.oxd-table-body';
+        this.popupDeleteButton = '(//div[@class="orangehrm-modal-footer"]//button)[2]';
+        this.contactDetails = '//a[text()="Contact Details"]';
+        this.contactDetailsLocators = {
+            street1 : '//label[text()="Street 1"]/../..//div/input',
+            street2 : '//label[text()="Street 2"]/../..//div/input',
+            city : '//label[text()="City"]/../..//div/input',
+            state : '//label[text()="State/Province"]/../..//div/input',
+            zip : '//label[text()="Zip/Postal Code"]/../..//div/input',
+            home : '//label[text()="Home"]/../..//div/input',
+            mobile : '//label[text()="Mobile"]/../..//div/input',
+            work : '//label[text()="Work"]/../..//div/input',
+            workEmail : '//label[text()="Work Email"]/../..//div/input',
+            otherEmail : '//label[text()="Other Email"]/../..//div/input',
+            country : '//label[text()="Country"]/../../..//div[@class="oxd-select-text--after"]',
+            container : '.orangehrm-edit-employee-content',
+        }
     }
 
     async clearTextBoxValues(locatorValue:any) {
         await this.page.locator(locatorValue).fill('');
     };
+
+    async isDeleteButtonPresent(){
+        return await this.page.locator(this.deleteSelectedButton).isVisible();
+    }
 
     async fillTextBoxValues(locatorValue:any, fillValue: any) {
         await this.page.locator(locatorValue).type(fillValue);
@@ -85,8 +108,8 @@ export class MyInfoPage {
         await this.page.locator(locatorValue).fill(fillValue);
     };
 
-    async selecDropdownOption(role:any, optionValue: any) {
-        await this.page.getByRole('option', { name: optionValue }).getByText(optionValue).click();
+    async selecDropdownOption(optionValue: any) {
+        await this.page.getByRole('option', { name: optionValue }).getByText(optionValue, { exact: true }).click();
     };
 
     async clickSave(locatorValue,index){
@@ -112,4 +135,11 @@ export class MyInfoPage {
     async uploadFile(filePath:any){
         await this.page.locator(this.uploadElement).setInputFiles(filePath);
     }
+
+    async clickContactDetailsMenu() {
+        await this.page.waitForSelector(this.contactDetails);
+        await this.page.getByRole('link', { name: 'Contact Details' }).click();
+        await this.page.waitForSelector(this.contactDetailsLocators.container);
+        await this.page.waitForTimeout(5000);
+    };
 }
