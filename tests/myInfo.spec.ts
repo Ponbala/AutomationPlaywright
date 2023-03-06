@@ -7,6 +7,52 @@ import ENV from '../support/env';
 
 let loginPage: LoginPage, homePage: HomePage, myInfoPage: MyInfoPage, testData: TestData, page: Page, utils: Utils;
 
+enum values1 {
+  firstName = "Pon",
+  middleName = "L",
+  lastName = "Balan",
+  nickName = "Agilesh",
+}
+
+enum values2 {
+  employeeId = "10",
+  otherId = "11",
+  driverLicenseNumber = "123",
+  ssnNumber = "110",
+  sinNumber = "111",
+}
+
+enum values3 {
+  street1 = "KLS",
+  street2 = "Mak",
+  city = "Pol",
+  state = "TN",
+  zip = "600097",
+  home = "7777777771",
+  mobile = "777777772",
+  work = "7777777773",
+  workEmail = "pon@hrm.com",
+  otherEmail = "ba@hrm.com",
+}
+
+enum values4 {
+  name = "Lin",
+  relationship = "Father",
+  homeTelephone = "7246363727",
+  mobile = "777777777",
+  workTelephone = "77777776"
+}
+
+let nameValues = [values1.firstName, values1.middleName, values1.lastName, values1.nickName];
+let idValues = [values2.employeeId, values2.otherId, values2.driverLicenseNumber, values2.ssnNumber, values2.sinNumber];
+let contactDetailValues = [values3.street1, values3.street2, values3.city, values3.state, values3.zip, values3.home, values3.mobile, values3.work, values3.workEmail, values3.otherEmail];
+let emergencyContactValues = [values4.name, values4.relationship, values4.homeTelephone, values4.mobile, values4.workTelephone];
+
+let namesLocators = [];
+let idLocators = [];
+let contactDetailsLocators = [];
+let emergencyContactLocators = [];
+
 test.beforeAll(async ({ browser }) => {
   page = await browser.newPage();
   // utils = new Utils(page);
@@ -33,28 +79,14 @@ test.afterAll(async () => {
 
 test.describe('Filling Personal details', () => {
   test('Filling the names section', async () => {
-    await myInfoPage.clearTextBoxValues(myInfoPage.firstName);
-    await myInfoPage.fillTextBoxValues(myInfoPage.firstName, 'Pon');
-    await myInfoPage.clearTextBoxValues(myInfoPage.middleName);
-    await myInfoPage.fillTextBoxValues(myInfoPage.middleName, 'L');
-    await myInfoPage.clearTextBoxValues(myInfoPage.lastName);
-    await myInfoPage.fillTextBoxValues(myInfoPage.lastName, 'Balan');
-    await myInfoPage.clearTextBoxValues(myInfoPage.nickName);
-    await myInfoPage.fillTextBoxValues(myInfoPage.nickName, 'Agilesh');
+    namesLocators = [myInfoPage.firstName, myInfoPage.middleName, myInfoPage.lastName, myInfoPage.nickName];
+    await myInfoPage.fillFieldValues(namesLocators, nameValues);
   });
 
   test('Filling the Id section', async () => {
-    await myInfoPage.clearTextBoxValues(myInfoPage.employeeId);
-    await myInfoPage.fillTextBoxValues(myInfoPage.employeeId, '10');
-    await myInfoPage.clearTextBoxValues(myInfoPage.otherId);
-    await myInfoPage.fillTextBoxValues(myInfoPage.otherId, '11');
-    await myInfoPage.clearTextBoxValues(myInfoPage.driverLicenseNumber);
-    await myInfoPage.fillTextBoxValues(myInfoPage.driverLicenseNumber, '123');
+    idLocators = [myInfoPage.employeeId, myInfoPage.otherId, myInfoPage.driverLicenseNumber, myInfoPage.ssnNumber, myInfoPage.sinNumber];
+    await myInfoPage.fillFieldValues(idLocators, idValues);
     await myInfoPage.fillDateValue(myInfoPage.licenseExpiryDate, '2030-11-25');
-    await myInfoPage.clearTextBoxValues(myInfoPage.ssnNumber);
-    await myInfoPage.fillTextBoxValues(myInfoPage.ssnNumber, '110');
-    await myInfoPage.clearTextBoxValues(myInfoPage.ssnNumber);
-    await myInfoPage.fillTextBoxValues(myInfoPage.ssnNumber, '111');
   });
 
   test('Filling the personal details section', async () => {
@@ -77,92 +109,51 @@ test.describe('Filling Personal details', () => {
   });
 
   test('Filling the personal details and verifying cancel button', async () => {
-    await myInfoPage.click(myInfoPage.addButton);
-    await page.waitForSelector(myInfoPage.browseButton);
-    await myInfoPage.click(myInfoPage.browseButton);
-    await myInfoPage.uploadFile('uploadTextFile.txt');
-    await myInfoPage.fillTextBoxValues(myInfoPage.commentBox, Constants.fillText.comment);
-    await myInfoPage.click(myInfoPage.cancel);
-    await page.waitForSelector(myInfoPage.noRecordsText);
+    await myInfoPage.uploadFile('uploadTextFile.txt', false);
   });
 
   test('Filling the personal details and verifying save button', async () => {
-    await myInfoPage.click(myInfoPage.addButton);
-    await page.waitForSelector(myInfoPage.browseButton);
-    // await page.setInputFiles(".oxd-file-input",'./uploadTextFile.txt');
-    page.on("filechooser", async (filechooser) => {
-      await filechooser.setFiles('uploadTextFile.txt')
-    });
-    await myInfoPage.click(myInfoPage.browseButton);
-    await myInfoPage.fillTextBoxValues(myInfoPage.commentBox, Constants.fillText.comment);
-    await page.locator(myInfoPage.save).last().click();
-    expect(await myInfoPage.getToastMessage()).toEqual(Constants.sucessMsg.sucessfulSavedMsg);
-    await myInfoPage.clickCloseIcon();
+    await myInfoPage.uploadFile('uploadTextFile.txt', true);
     expect(page.locator(myInfoPage.table)).toBeVisible();
     await page.waitForTimeout(4000);
   });
 
   test('Deleting the existing attachments', async () => {
-    //Deleteing Existing attachments
     await myInfoPage.click(myInfoPage.attachmentCheckBox);
-    if (await myInfoPage.isDeleteButtonPresent()) {
-      await (await page.waitForSelector(myInfoPage.deleteSelectedButton)).waitForElementState("stable");
-      expect(page.locator(myInfoPage.deleteSelectedButton)).toBeVisible();
-      await myInfoPage.click(myInfoPage.deleteSelectedButton);
-      await page.waitForSelector(myInfoPage.confirmationPopup);
-      await page.locator(myInfoPage.popupDeleteButton).click();
-      expect(await myInfoPage.getToastMessage()).toEqual(Constants.sucessMsg.successfulDeletedMsg);
-      const record = await page.locator(myInfoPage.noRecordsText).textContent();
-      expect(record).toContain(Constants.noRecordsText);
-    }
+    await myInfoPage.deleteExistingFiles();
   });
 
   test('Uploading a new file and checking the checkbox and performing delete operation', async () => {
-    await myInfoPage.click(myInfoPage.addButton);
-    await page.waitForSelector(myInfoPage.browseButton);
-    await myInfoPage.uploadFile('uploadTextFile.txt');
-    await page.waitForTimeout(5000);
-    await page.locator(myInfoPage.save).last().click();
-    expect(await myInfoPage.getToastMessage()).toEqual(Constants.sucessMsg.sucessfulSavedMsg);
-    await myInfoPage.clickCloseIcon();
-    await page.locator(myInfoPage.deleteIcon).first().click();
-    await page.waitForSelector(myInfoPage.confirmationPopup);
-    expect(await page.locator(myInfoPage.popupText).textContent()).toEqual(Constants.popupText.text);
-    await page.getByRole('button', { name: /^\s*No, Cancel\s*$/i }).click();
-    expect(page.locator(myInfoPage.attachemtRow).first()).toBeVisible();
-    console.log("cancel passed");
-    await page.locator(myInfoPage.deleteIcon).first().click();
-    await page.waitForSelector(myInfoPage.confirmationPopup);
-    await page.locator(myInfoPage.popupDeleteButton).click();
-    expect(page.locator(myInfoPage.attachemtRow).first()).not.toBeVisible();
+    await myInfoPage.uploadFile('uploadTextFile.txt', true);
+    await myInfoPage.deleteAttachedFile("cancel");
+    await myInfoPage.deleteAttachedFile("save");
   });
 });
 
 test.describe('Filling Contact details', () => {
   test('Filling the Address section fields', async () => {
     await myInfoPage.clickContactDetailsMenu();
-    await myInfoPage.clearTextBoxValues(myInfoPage.contactDetailsLocators.street1);
-    await myInfoPage.fillTextBoxValues(myInfoPage.contactDetailsLocators.street1, 'KLS');
-    await myInfoPage.clearTextBoxValues(myInfoPage.contactDetailsLocators.street2);
-    await myInfoPage.fillTextBoxValues(myInfoPage.contactDetailsLocators.street2, 'Mak');
-    await myInfoPage.clearTextBoxValues(myInfoPage.contactDetailsLocators.city);
-    await myInfoPage.fillTextBoxValues(myInfoPage.contactDetailsLocators.city, 'Pol');
-    await myInfoPage.clearTextBoxValues(myInfoPage.contactDetailsLocators.state);
-    await myInfoPage.fillTextBoxValues(myInfoPage.contactDetailsLocators.state, 'TN');
-    await myInfoPage.clearTextBoxValues(myInfoPage.contactDetailsLocators.zip);
-    await myInfoPage.fillTextBoxValues(myInfoPage.contactDetailsLocators.zip, '600097');
+    contactDetailsLocators = [myInfoPage.contactDetailsLocators.street1, myInfoPage.contactDetailsLocators.street2,
+    myInfoPage.contactDetailsLocators.city, myInfoPage.contactDetailsLocators.state, myInfoPage.contactDetailsLocators.zip,
+    myInfoPage.contactDetailsLocators.home, myInfoPage.contactDetailsLocators.mobile, myInfoPage.contactDetailsLocators.work,
+    myInfoPage.contactDetailsLocators.workEmail, myInfoPage.contactDetailsLocators.otherEmail];
+    await myInfoPage.fillFieldValues(contactDetailsLocators, contactDetailValues);
     await myInfoPage.click(myInfoPage.contactDetailsLocators.country);
     await myInfoPage.selecDropdownOption('India');
-    await myInfoPage.clearTextBoxValues(myInfoPage.contactDetailsLocators.home);
-    await myInfoPage.fillTextBoxValues(myInfoPage.contactDetailsLocators.home, 'pol');
-    await myInfoPage.clearTextBoxValues(myInfoPage.contactDetailsLocators.mobile);
-    await myInfoPage.fillTextBoxValues(myInfoPage.contactDetailsLocators.mobile, '7777777777');
-    await myInfoPage.clearTextBoxValues(myInfoPage.contactDetailsLocators.work);
-    await myInfoPage.fillTextBoxValues(myInfoPage.contactDetailsLocators.work, '7777777777');
-    await myInfoPage.clearTextBoxValues(myInfoPage.contactDetailsLocators.workEmail);
-    await myInfoPage.fillTextBoxValues(myInfoPage.contactDetailsLocators.workEmail, 'pon@hrm.com');
-    await myInfoPage.clearTextBoxValues(myInfoPage.contactDetailsLocators.otherEmail);
-    await myInfoPage.fillTextBoxValues(myInfoPage.contactDetailsLocators.otherEmail, 'ba@hrm.com');
     await myInfoPage.clickSave(myInfoPage.save, 0);
+  });
+});
+
+test.describe('Filling Emergency Contacts details', () => {
+  test('Filling Emergency Contacts details', async () => {
+    await myInfoPage.clickEmergencyContactsMenu();
+    await myInfoPage.clickElementWithIndex(myInfoPage.addButton, 0);
+    emergencyContactLocators = [myInfoPage.emergencyContactDetails.nameInputField, myInfoPage.emergencyContactDetails.relationship, myInfoPage.emergencyContactDetails.homeTelephone, myInfoPage.emergencyContactDetails.mobile, myInfoPage.emergencyContactDetails.workTelephone];
+    await myInfoPage.fillFieldValues(emergencyContactLocators, emergencyContactValues);
+    await myInfoPage.clickSave(myInfoPage.save, 1);
+    expect(await myInfoPage.getToastMessage()).toEqual(Constants.sucessMsg.sucessfulSavedMsg);
+    await myInfoPage.clickCloseIcon();
+    await myInfoPage.clickElementWithIndex(myInfoPage.addButton, 1);
+    await myInfoPage.uploadFile('uploadTextFile.txt', true);
   });
 });

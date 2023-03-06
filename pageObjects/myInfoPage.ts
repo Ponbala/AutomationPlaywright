@@ -1,4 +1,5 @@
 import { Page, expect } from "@playwright/test";
+import Constants from '../support/constants.json';
 
 export class MyInfoPage {
     readonly page: Page;
@@ -37,7 +38,8 @@ export class MyInfoPage {
     readonly table: string;
     readonly popupDeleteButton: string;
     readonly contactDetailsLocators: any;
-    contactDetails: string;
+    readonly contactDetails: string;
+    readonly emergencyContactDetails: any;
 
     constructor(page: Page) {
         this.page = page;
@@ -77,34 +79,45 @@ export class MyInfoPage {
         this.popupDeleteButton = '(//div[@class="orangehrm-modal-footer"]//button)[2]';
         this.contactDetails = '//a[text()="Contact Details"]';
         this.contactDetailsLocators = {
-            street1 : '//label[text()="Street 1"]/../..//div/input',
-            street2 : '//label[text()="Street 2"]/../..//div/input',
-            city : '//label[text()="City"]/../..//div/input',
-            state : '//label[text()="State/Province"]/../..//div/input',
-            zip : '//label[text()="Zip/Postal Code"]/../..//div/input',
-            home : '//label[text()="Home"]/../..//div/input',
-            mobile : '//label[text()="Mobile"]/../..//div/input',
-            work : '//label[text()="Work"]/../..//div/input',
-            workEmail : '//label[text()="Work Email"]/../..//div/input',
-            otherEmail : '//label[text()="Other Email"]/../..//div/input',
-            country : '//label[text()="Country"]/../../..//div[@class="oxd-select-text--after"]',
-            container : '.orangehrm-edit-employee-content',
+            street1: '//label[text()="Street 1"]/../..//div/input',
+            street2: '//label[text()="Street 2"]/../..//div/input',
+            city: '//label[text()="City"]/../..//div/input',
+            state: '//label[text()="State/Province"]/../..//div/input',
+            zip: '//label[text()="Zip/Postal Code"]/../..//div/input',
+            home: '//label[text()="Home"]/../..//div/input',
+            mobile: '//label[text()="Mobile"]/../..//div/input',
+            work: '//label[text()="Work"]/../..//div/input',
+            workEmail: '//label[text()="Work Email"]/../..//div/input',
+            otherEmail: '//label[text()="Other Email"]/../..//div/input',
+            country: '//label[text()="Country"]/../../..//div[@class="oxd-select-text--after"]',
+            container: '.orangehrm-edit-employee-content',
+        }
+        this.emergencyContactDetails = {
+            emergencyContactMenuLink : `//a[text()="Emergency Contacts"]`,
+            emergencyContactContainer : '.orangehrm-edit-employee-content',
+            nameInputField: '//label[text()="Name"]/../..//div/input',
+            relationship: '//label[text()="Relationship"]/../..//div/input',
+            homeTelephone: '//label[text()="Home Telephone"]/../..//div/input',
+            mobile: '//label[text()="Mobile"]/../..//div/input',
+            workTelephone: '//label[text()="Work Telephone"]/../..//div/input'
         }
     }
 
-    async clearTextBoxValues(locatorValue:any) {
+    async clearTextBoxValues(locatorValue: any) {
         await this.page.locator(locatorValue).fill('');
+        // await this.page.waitForTimeout(2000);
     };
 
-    async isDeleteButtonPresent(){
+    async isDeleteButtonPresent() {
         return await this.page.locator(this.deleteSelectedButton).isVisible();
     }
 
-    async fillTextBoxValues(locatorValue:any, fillValue: any) {
+    async fillTextBoxValues(locatorValue: any, fillValue: any) {
+        await (await this.page.waitForSelector(locatorValue)).waitForElementState("stable");
         await this.page.locator(locatorValue).type(fillValue);
     };
 
-    async fillDateValue(locatorValue:any, fillValue: any) {
+    async fillDateValue(locatorValue: any, fillValue: any) {
         await this.page.locator(locatorValue).fill(fillValue);
     };
 
@@ -112,7 +125,7 @@ export class MyInfoPage {
         await this.page.getByRole('option', { name: optionValue }).getByText(optionValue, { exact: true }).click();
     };
 
-    async clickSave(locatorValue,index){
+    async clickSave(locatorValue, index) {
         await this.page.locator(locatorValue).nth(index).click();
     }
 
@@ -120,20 +133,50 @@ export class MyInfoPage {
         return await this.page.locator(this.toastMessage).textContent();
     }
 
-    async clickCloseIcon(){
+    async clickCloseIcon() {
         await this.page.locator(this.closeIcon).click();
     }
 
-    async click(locator: any){
+    async click(locator: any) {
         await this.page.locator(locator).click({ force: true });
     }
 
-    async clickElementWithIndex(locatorValue,index){
+    async clickElementWithIndex(locatorValue, index) {
         await this.page.locator(locatorValue).nth(index).click();
     }
 
-    async uploadFile(filePath:any){
-        await this.page.locator(this.uploadElement).setInputFiles(filePath);
+    async uploadFile(filePath: any, boolean: any) {
+        await this.click(this.addButton);
+        await this.page.waitForSelector(this.browseButton);
+        // this.page.on("filechooser", async (filechooser) => {
+        //     await filechooser.setFiles('uploadTextFile.txt')
+        //   });
+        await this.page.setInputFiles(this.uploadElement, filePath);
+        await this.fillTextBoxValues(this.commentBox, Constants.fillText.comment);
+        await this.page.waitForTimeout(3000);
+        if (boolean) {
+            await this.page.locator(this.save).last().click();
+            expect(await this.getToastMessage()).toEqual(Constants.sucessMsg.sucessfulSavedMsg);
+            await this.clickCloseIcon();
+        }
+        else {
+            await this.click(this.cancel);
+            await this.page.waitForSelector(this.noRecordsText);
+        }
+    }
+
+    async deleteExistingFiles() {
+        if (await this.isDeleteButtonPresent()) {
+            await (await this.page.waitForSelector(this.deleteSelectedButton)).waitForElementState("stable");
+            expect(this.page.locator(this.deleteSelectedButton)).toBeVisible();
+            await this.click(this.deleteSelectedButton);
+            await this.page.waitForSelector(this.confirmationPopup);
+            await this.page.locator(this.popupDeleteButton).click();
+            expect(await this.getToastMessage()).toEqual(Constants.sucessMsg.successfulDeletedMsg);
+            await this.page.waitForTimeout(3000);
+            const record = await this.page.locator(this.noRecordsText).textContent();
+            expect(record).toContain(Constants.noRecordsText);
+        }
     }
 
     async clickContactDetailsMenu() {
@@ -142,4 +185,37 @@ export class MyInfoPage {
         await this.page.waitForSelector(this.contactDetailsLocators.container);
         await this.page.waitForTimeout(5000);
     };
+
+    async clickEmergencyContactsMenu() {
+        await this.page.waitForSelector(this.emergencyContactDetails.emergencyContactMenuLink);
+        await this.page.getByRole('link', { name: 'Emergency Contacts' }).click();
+        await this.page.waitForSelector(this.contactDetailsLocators.container);
+        await this.page.waitForTimeout(5000);
+    };
+
+    async deleteAttachedFile(confirmation: string) {
+        if (confirmation == "cancel") {
+            await this.page.locator(this.deleteIcon).first().click();
+            await this.page.waitForSelector(this.confirmationPopup);
+            expect(await this.page.locator(this.popupText).textContent()).toEqual(Constants.popupText.text);
+            await this.page.getByRole('button', { name: /^\s*No, Cancel\s*$/i }).click();
+            expect(this.page.locator(this.attachemtRow).first()).toBeVisible();
+        }
+        else {
+            await this.page.locator(this.deleteIcon).first().click();
+            await this.page.waitForSelector(this.confirmationPopup);
+            expect(await this.page.locator(this.popupText).textContent()).toEqual(Constants.popupText.text);
+            await this.page.locator(this.popupDeleteButton).click();
+            expect(this.page.locator(this.attachemtRow).first()).not.toBeVisible();
+        }
+    };
+
+    async fillFieldValues(namesLocators: any[], values: any) {
+        for (const locator of namesLocators) {
+            await this.clearTextBoxValues(locator);
+            const index = namesLocators.indexOf(locator);
+            await this.fillTextBoxValues(locator, values[index]);
+            await this.page.waitForTimeout(3000);
+          };
+    }
 }
