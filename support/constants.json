@@ -1,25 +1,36 @@
 {
-    "Credentials": {
-        "stdUser": "Admin",
-        "password": "admin123"
-    },
     "Urls": {
-        "login": "/.*login/",
-        "dashboard": "/.*dashboard/"
+        "widgets": "/.*widgets/"
     },
     "TitleVerification": {
-        "loginPageTitle": "OrangeHRM"
+        "loginPageTitle": "DEMOQA"
     },
-    "sucessMsg": {
-        "successfulUpdatedMsg": "Successfully Updated",
-        "successfulDeletedMsg": "Successfully Deleted",
-        "sucessfulSavedMsg": "Successfully Saved"
+    "sections": {
+        "section1": "What is Lorem Ipsum?",
+        "section2": "Where does it come from?",
+        "section3": "Why do we use it?"
+    },
+    "roles": {
+        "listItemRole": "listitem",
+        "textBoxRole": "textbox"
+    },
+    "colours": {
+        "blueAndBlack": ["Blue","Black"],
+        "blue": "Blue",
+        "black": "Black"
+    },
+    "textValues": {
+        "accordian": "Accordian",
+        "autoComplete": "Auto Complete"
+    },
+    "collapse": {
+        "collapseShow": "collapse show",
+        "collapseHide": "collapse"
     },
     "fillText": {
         "comment": "Text file has been uploaded"
     },
     "popupText": {
         "text": "The selected record will be permanently deleted. Are you sure you want to continue?"
-    },
-    "noRecordsText": "No Records Found"
+    }
 }

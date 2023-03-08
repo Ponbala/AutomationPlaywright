@@ -38,7 +38,7 @@ export default defineConfig({
   // reporter: [['@reportportal/agent-js-playwright', RPconfig]],
   use: {
     actionTimeout: 30000,
-    baseURL: 'https://opensource-demo.orangehrmlive.com',
+    baseURL: 'https://demoqa.com',
     headless: false,
     trace: 'on',
     // video: "on",
