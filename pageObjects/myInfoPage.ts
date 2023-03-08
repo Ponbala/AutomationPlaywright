@@ -40,6 +40,9 @@ export class MyInfoPage {
     readonly contactDetailsLocators: any;
     readonly contactDetails: string;
     readonly emergencyContactDetails: any;
+    readonly container: string;
+    readonly nameInputField: string;
+    readonly dependentsDetails: any;
 
     constructor(page: Page) {
         this.page = page;
@@ -62,7 +65,7 @@ export class MyInfoPage {
         this.save = 'button.oxd-button--medium';
         this.toastMessage = 'p.oxd-text--toast-message';
         this.closeIcon = '.oxd-toast-close-container';
-        this.bloodType = `//label[text()='Blood Type']/../../../..//div/i`;
+        this.bloodType = `//label[text()='Blood Type']/../..//*[@class='oxd-select-wrapper']/div`;
         this.addButton = 'button.oxd-button--text';
         this.browseButton = '//div[text()="Browse"]';
         this.uploadElement = '.oxd-file-input';
@@ -78,6 +81,8 @@ export class MyInfoPage {
         this.table = '.oxd-table-body';
         this.popupDeleteButton = '(//div[@class="orangehrm-modal-footer"]//button)[2]';
         this.contactDetails = '//a[text()="Contact Details"]';
+        this.container = '.orangehrm-edit-employee-content';
+        this.nameInputField = '//label[text()="Name"]/../..//div/input';
         this.contactDetailsLocators = {
             street1: '//label[text()="Street 1"]/../..//div/input',
             street2: '//label[text()="Street 2"]/../..//div/input',
@@ -89,23 +94,24 @@ export class MyInfoPage {
             work: '//label[text()="Work"]/../..//div/input',
             workEmail: '//label[text()="Work Email"]/../..//div/input',
             otherEmail: '//label[text()="Other Email"]/../..//div/input',
-            country: '//label[text()="Country"]/../../..//div[@class="oxd-select-text--after"]',
-            container: '.orangehrm-edit-employee-content',
+            country: '//label[text()="Country"]/../../..//div[@class="oxd-select-text--after"]'
         }
         this.emergencyContactDetails = {
-            emergencyContactMenuLink : `//a[text()="Emergency Contacts"]`,
-            emergencyContactContainer : '.orangehrm-edit-employee-content',
-            nameInputField: '//label[text()="Name"]/../..//div/input',
+            emergencyContactMenuLink: `//a[text()="Emergency Contacts"]`,
             relationship: '//label[text()="Relationship"]/../..//div/input',
             homeTelephone: '//label[text()="Home Telephone"]/../..//div/input',
             mobile: '//label[text()="Mobile"]/../..//div/input',
             workTelephone: '//label[text()="Work Telephone"]/../..//div/input'
         }
+        this.dependentsDetails = {
+            dependentsMenuLink: `//a[text()="Dependents"]`,
+            relationship: '//label[text()="Relationship"]/../../..//div[@class="oxd-select-text--after"]'
     }
+}
 
     async clearTextBoxValues(locatorValue: any) {
         await this.page.locator(locatorValue).fill('');
-        // await this.page.waitForTimeout(2000);
+        await this.page.waitForTimeout(1000);
     };
 
     async isDeleteButtonPresent() {
@@ -121,12 +127,15 @@ export class MyInfoPage {
         await this.page.locator(locatorValue).fill(fillValue);
     };
 
-    async selecDropdownOption(optionValue: any) {
+    async selecDropdownOption(locator: any, optionValue: any) {
+        await this.click(locator);
         await this.page.getByRole('option', { name: optionValue }).getByText(optionValue, { exact: true }).click();
     };
 
-    async clickSave(locatorValue, index) {
+    async clickSave(locatorValue: string, index: number, messageToVerify?: string) {
         await this.page.locator(locatorValue).nth(index).click();
+        expect(await this.getToastMessage()).toEqual(messageToVerify);
+        await this.clickCloseIcon();
     }
 
     async getToastMessage() {
@@ -145,7 +154,7 @@ export class MyInfoPage {
         await this.page.locator(locatorValue).nth(index).click();
     }
 
-    async uploadFile(filePath: any, boolean: any) {
+    async uploadFile(filePath: any, value: boolean) {
         await this.click(this.addButton);
         await this.page.waitForSelector(this.browseButton);
         // this.page.on("filechooser", async (filechooser) => {
@@ -154,7 +163,7 @@ export class MyInfoPage {
         await this.page.setInputFiles(this.uploadElement, filePath);
         await this.fillTextBoxValues(this.commentBox, Constants.fillText.comment);
         await this.page.waitForTimeout(3000);
-        if (boolean) {
+        if (value) {
             await this.page.locator(this.save).last().click();
             expect(await this.getToastMessage()).toEqual(Constants.sucessMsg.sucessfulSavedMsg);
             await this.clickCloseIcon();
@@ -182,16 +191,30 @@ export class MyInfoPage {
     async clickContactDetailsMenu() {
         await this.page.waitForSelector(this.contactDetails);
         await this.page.getByRole('link', { name: 'Contact Details' }).click();
-        await this.page.waitForSelector(this.contactDetailsLocators.container);
+        await this.page.waitForSelector(this.container);
         await this.page.waitForTimeout(5000);
     };
 
     async clickEmergencyContactsMenu() {
         await this.page.waitForSelector(this.emergencyContactDetails.emergencyContactMenuLink);
         await this.page.getByRole('link', { name: 'Emergency Contacts' }).click();
-        await this.page.waitForSelector(this.contactDetailsLocators.container);
+        await this.page.waitForSelector(this.container);
         await this.page.waitForTimeout(5000);
     };
+
+    async clickDependentsMenu() {
+        await this.page.waitForSelector(this.dependentsDetails.dependentsMenuLink);
+        await this.page.getByRole('link', { name: 'Dependents' }).click();
+        await this.page.waitForSelector(this.container);
+        await this.page.waitForTimeout(5000);
+    };
+
+    async clickMenu(locator, menuLink){
+        await this.page.waitForSelector(locator);
+        await this.page.getByRole('link', { name: menuLink }).click();
+        await this.page.waitForSelector(this.container);
+        await this.page.waitForTimeout(5000);
+    }
 
     async deleteAttachedFile(confirmation: string) {
         if (confirmation == "cancel") {
@@ -210,12 +233,12 @@ export class MyInfoPage {
         }
     };
 
-    async fillFieldValues(namesLocators: any[], values: any) {
+    async fillFieldValues(namesLocators: any, values: any) {
         for (const locator of namesLocators) {
             await this.clearTextBoxValues(locator);
             const index = namesLocators.indexOf(locator);
             await this.fillTextBoxValues(locator, values[index]);
             await this.page.waitForTimeout(3000);
-          };
+        };
     }
 }

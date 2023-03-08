@@ -14,9 +14,9 @@ export class HomePage {
     }
 
     async clickMyInfoMenu() {
-        await this.page.waitForSelector(this.myInfo);
+        await (await this.page.waitForSelector(this.myInfo)).waitForElementState('stable');
         await this.page.getByRole('link', { name: 'My Info' }).click();
         await this.page.waitForSelector(this.myInfoContainer);
-        await this.page.waitForTimeout(3000);
+        await this.page.waitForTimeout(2000);
     };
 }

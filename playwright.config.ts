@@ -40,7 +40,7 @@ export default defineConfig({
     actionTimeout: 30000,
     baseURL: 'https://opensource-demo.orangehrmlive.com',
     headless: false,
-    // trace: 'on',
+    trace: 'on',
     // video: "on",
     screenshot: "on"
   },
