@@ -14,23 +14,66 @@
         "listItemRole": "listitem",
         "textBoxRole": "textbox"
     },
+    "bool": {
+        "true": "true",
+        "false": "false"
+    },
     "colours": {
-        "blueAndBlack": ["Blue","Black"],
+        "blueAndBlack": [
+            "Blue",
+            "Black"
+        ],
         "blue": "Blue",
         "black": "Black"
     },
     "textValues": {
         "accordian": "Accordian",
-        "autoComplete": "Auto Complete"
+        "autoComplete": "Auto Complete",
+        "datePicker": "Date Picker",
+        "slider": "Slider",
+        "progressBar": "Progress Bar",
+        "tabs": "Tabs",
+        "toolTips": "Tool Tips",
+        "menu": "Menu",
+        "selectMenu": "Select Menu",
+        "previousMonth": "Previous Month",
+        "selectedDate": "12/25/2023",
+        "selectedDateTime": "February 7, 2023 10:45 AM",
+        "disabled": "disabled"
+    },
+    "attribute": {
+        "ariaSelected": "aria-selected",
+        "class": "class"
     },
     "collapse": {
         "collapseShow": "collapse show",
         "collapseHide": "collapse"
     },
-    "fillText": {
-        "comment": "Text file has been uploaded"
+    "hoverText": {
+        "button": "You hovered over the Button",
+        "field": "You hovered over the text field",
+        "contrary": "You hovered over the Contrary",
+        "date": "You hovered over the 1.10.32"
     },
     "popupText": {
         "text": "The selected record will be permanently deleted. Are you sure you want to continue?"
+    },
+    "months": {
+        "january": "January",
+        "december": "December"
+    },
+    "years": {
+        "2022": "2022",
+        "2023": "2023"
+    },
+    "days": {
+        "1": "1",
+        "2": "2",
+        "7": "7",
+        "25": "25"
+    },
+    "time": {
+        "10:30": "10:30",
+        "10:45": "10:45"
     }
 }

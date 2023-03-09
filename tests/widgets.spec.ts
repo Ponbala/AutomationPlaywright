@@ -13,7 +13,7 @@ test.beforeAll(async ({ browser }) => {
   widgetPage = new WidgetPage(page);
   testData = new TestData(page);
   await widgetPage.getBaseURL();
-  await widgetPage.clickElement(widgetPage.card, 3);
+  await widgetPage.clickElementWithIndex(widgetPage.card, 3);
   await page.waitForSelector(widgetPage.accordianContainer);
 });
 
@@ -37,5 +37,34 @@ test.describe('Widgets', () => {
     expect(await widgetPage.getSelectedValues(widgetPage.multiSelectValues, true)).toEqual(Constants.colours.blueAndBlack);
     await widgetPage.selectOption(Constants.roles.textBoxRole, 1, Constants.colours.blue);
     expect(await widgetPage.getSelectedValues(widgetPage.singleSelectValue)).toEqual(Constants.colours.blue);
+  });
+
+  test('Date Picker test', async () => {
+    await widgetPage.clickElementForGetByRole(Constants.roles.listItemRole, Constants.textValues.datePicker, widgetPage.dataPickerContainer);
+    let monthYearValue = await widgetPage.selectDateAndGetValue(widgetPage.monthYearInput, 0, Constants.months.december, Constants.days[25], Constants.time['10:45'], Constants.roles.listItemRole, false, Constants.years[2023]);
+    expect(monthYearValue).toEqual(Constants.textValues.selectedDate);
+    let monthYearTimeValue = await widgetPage.selectDateAndGetValue(widgetPage.monthYearTimeInput, 0, Constants.textValues.previousMonth, Constants.days[7], Constants.time['10:45'], Constants.roles.listItemRole, true);
+    expect(monthYearTimeValue).toEqual(Constants.textValues.selectedDateTime);
+  });
+
+  test('Tabs test', async () => {
+    await widgetPage.clickElementForGetByRole(Constants.roles.listItemRole, Constants.textValues.tabs, widgetPage.tabsContainer);
+    expect(page.locator(widgetPage.whatTab)).toHaveAttribute(Constants.attribute.ariaSelected, Constants.bool.true);
+    expect(await widgetPage.getOriginTab()).toHaveAttribute(Constants.attribute.ariaSelected, Constants.bool.false);
+    await (await widgetPage.getOriginTab()).click();
+    expect(await widgetPage.getOriginTab()).toHaveAttribute(Constants.attribute.ariaSelected, Constants.bool.true);
+    expect(await widgetPage.getUseTab()).toHaveAttribute(Constants.attribute.ariaSelected, Constants.bool.false);
+    await (await widgetPage.getUseTab()).click();
+    expect(await widgetPage.getUseTab()).toHaveAttribute(Constants.attribute.ariaSelected, Constants.bool.true);
+    expect(await widgetPage.getMoreTab()).toHaveAttribute(Constants.attribute.ariaSelected, Constants.bool.false);
+    let isDisabled = await (await widgetPage.getMoreTab()).getAttribute(Constants.attribute.class);
+    expect(isDisabled).toContain(Constants.textValues.disabled);
+  });
+
+  test('Tooltip test', async () => {
+    await widgetPage.clickElementForGetByRole(Constants.roles.listItemRole, Constants.textValues.toolTips, widgetPage.tooltipContainer);
+    let locators = [widgetPage.tooltipButton, widgetPage.tooltipFieldContainer, widgetPage.tooltipContrary, widgetPage.tooltipDate];
+    let tooltipValues = [Constants.hoverText.button, Constants.hoverText.field, Constants.hoverText.contrary, Constants.hoverText.date];
+    await widgetPage.hoverAllElements(locators, tooltipValues);
   });
 });

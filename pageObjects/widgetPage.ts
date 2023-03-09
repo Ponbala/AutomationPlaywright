@@ -13,6 +13,23 @@ export class WidgetPage {
     readonly multiSelectValues: string;
     readonly singleSelectValue: string;
     readonly autoCompleteOption: string;
+    readonly dataPickerContainer: string;
+    readonly monthYearInput: string;
+    readonly monthYearTimeInput: string;
+    readonly monthDropdown: string;
+    readonly yearDropdown: string;
+    readonly dateContainer: string;
+    readonly tabsContainer: string;
+    readonly whatTab: string;
+    readonly originTab: string;
+    readonly useTab: string;
+    readonly moreTab: string;
+    readonly tooltipButton: string;
+    readonly tooltipFieldContainer: string;
+    readonly tooltipContrary: string;
+    readonly tooltipDate: string;
+    readonly tooltipContainer: string;
+    readonly tooltipText: string;
 
     constructor(page: Page) {
         this.page = page;
@@ -25,6 +42,24 @@ export class WidgetPage {
         this.multiSelectValues = '.auto-complete__multi-value__label';
         this.singleSelectValue = '.auto-complete__single-value';
         this.autoCompleteOption = '.auto-complete__menu';
+        this.dataPickerContainer = '#datePickerContainer';
+        this.dateContainer = '.react-datepicker';
+        this.monthYearInput = '#datePickerMonthYearInput';
+        this.monthYearTimeInput = '#dateAndTimePickerInput';
+        this.monthDropdown = '.react-datepicker__month-select';
+        this.yearDropdown = '.react-datepicker__year-select';
+        this.tabsContainer = '#tabsContainer';
+        this.whatTab = '#demo-tab-what';
+        this.originTab = '#demo-tab-origin';
+        this.useTab = '#demo-tab-use';
+        this.moreTab = '#demo-tab-more';
+        this.tooltipButton = '#toolTipButton';
+        this.tooltipFieldContainer = '#texFieldToolTopContainer';
+        this.tooltipContrary = "//div[@id='texToolTopContainer']/a[text()='Contrary']";
+        this.tooltipDate = "//div[@id='texToolTopContainer']/a[text()='1.10.32']";
+        this.tooltipContainer = '#toopTipContainer';
+        this.tooltipText = '.tooltip-inner';
+
         // this.contactDetailsLocators = {
         //     street1: '//label[text()="Street 1"]/../..//div/input'
         // }
@@ -39,16 +74,20 @@ export class WidgetPage {
         return sectionValue;
     }
 
-    async clickElement(locator: string, index: number) {
+    async clickElementWithIndex(locator: string, index: number) {
         await this.page.locator(locator).nth(index).click();
         await this.page.waitForTimeout(2000);
     }
 
-    async clickElementForText(text: string | RegExp) {
-        await this.page.getByText(text).click();
+    async clickElement(locator: string) {
+        await this.page.locator(locator).click();
     }
 
-    async clickElementForGetByRole(role: any, visibleText: string, waitForLocator?) {
+    async clickElementForText(text: string | RegExp) {
+        await this.page.getByText(text, { exact: true }).click();
+    }
+
+    async clickElementForGetByRole(role: any, visibleText: string, waitForLocator?: string) {
         await this.page.getByRole(role).filter({ hasText: visibleText }).click();
         if (waitForLocator) {
             await this.page.waitForSelector(waitForLocator);
@@ -66,15 +105,15 @@ export class WidgetPage {
     async clickOption() {
         await this.page.locator(this.autoCompleteOption).click();
     }
-    async clearTextboxValues(role, index) {
+    async clearTextboxValues(role: any, index: number) {
         await this.page.getByRole(role).nth(index).fill('');
     }
 
-    async fillValues(role, index, value) {
+    async fillValues(role: any, index: number, value: string) {
         await this.page.getByRole(role).nth(index).type(value);
     }
 
-    async selectOption(role, index, value, isClear?: boolean) {
+    async selectOption(role: any, index: any, value: any, isClear?: boolean) {
         if (isClear) {
             await this.clearTextboxValues(role, index);
         }
@@ -82,12 +121,66 @@ export class WidgetPage {
         await this.clickOption();
     }
 
-    async getSelectedValues(locator, isMultiple?: boolean) {
+    async getSelectedValues(locator: string, isMultiple?: boolean) {
         if (isMultiple) {
             return await this.page.locator(locator).allTextContents();
         }
         else {
             return await this.page.locator(locator).textContent();
+        }
+    }
+
+    async getInputValue(locator: string) {
+        return await this.page.locator(locator).inputValue();
+    }
+
+    async selectDateAndGetValue(inputLocator: string, index: number, month: string, day: string, time: string, role: string, isdateAndTime: boolean, year?: string) {
+        await this.clickElementWithIndex(inputLocator, index);
+        if (!isdateAndTime) {
+            await this.page.selectOption(this.monthDropdown, month);
+            await this.page.selectOption(this.yearDropdown, year);
+            await this.clickElementForText(day);
+            return await this.getInputValue(inputLocator);
+        }
+        else {
+            await this.clickElementForText(month);
+            await this.clickElementForText(day);
+            await this.clickElementForGetByRole(role, time);
+            return await this.getInputValue(inputLocator);
+        }
+    }
+
+    async getWhatTab() {
+        return this.page.locator(this.originTab);
+    }
+
+    async getOriginTab() {
+        return this.page.locator(this.originTab);
+    }
+
+    async getMoreTab() {
+        return this.page.locator(this.moreTab);
+    }
+
+    async getUseTab() {
+        return this.page.locator(this.useTab);
+    }
+
+    async hoverElement(locator: string) {
+        await this.page.locator(locator).hover();
+        await this.page.waitForTimeout(1000);
+    }
+
+    async getTooltipValue() {
+        return this.page.locator(this.tooltipText).textContent();
+    }
+
+    async hoverAllElements(locators: any[], tooltipValues: string[]) {
+        for (let locator of locators) {
+            await this.hoverElement(locator);
+            let index = locators.indexOf(locator);
+            let hoverValue = await this.getTooltipValue();
+            expect(hoverValue).toEqual(tooltipValues[index]);
         }
     }
 }
