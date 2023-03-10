@@ -5,12 +5,14 @@ import { TestData } from '../testData/testData';
 import { WidgetPage } from '../pageObjects';
 
 let widgetPage: WidgetPage, testData: TestData, page: Page, utils: Utils;
+let multiselectDropdownLocators = [];
 
 test.beforeAll(async ({ browser }) => {
   page = await browser.newPage();
-  // utils = new Utils(page);
+  utils = new Utils(page);
   // await utils.launchBrowsers();
   widgetPage = new WidgetPage(page);
+  multiselectDropdownLocators = [widgetPage.greenOption, widgetPage.blueOption, widgetPage.blackOption, widgetPage.redOption];
   testData = new TestData(page);
   await widgetPage.getBaseURL();
   await widgetPage.clickElementWithIndex(widgetPage.card, 3);
@@ -66,5 +68,27 @@ test.describe('Widgets', () => {
     let locators = [widgetPage.tooltipButton, widgetPage.tooltipFieldContainer, widgetPage.tooltipContrary, widgetPage.tooltipDate];
     let tooltipValues = [Constants.hoverText.button, Constants.hoverText.field, Constants.hoverText.contrary, Constants.hoverText.date];
     await widgetPage.hoverAllElements(locators, tooltipValues);
+  });
+
+  test('Tooltip test', async () => {
+    await widgetPage.clickElementForGetByRole(Constants.roles.listItemRole, Constants.textValues.menu, widgetPage.menuContainer);
+    await widgetPage.hoverElement(widgetPage.mainItem2);
+    expect(await widgetPage.getSubItem()).toBeVisible();
+    await widgetPage.hoverElement(widgetPage.subSubList);
+    expect(await widgetPage.getElement(widgetPage.subSubItem1)).toBeVisible();
+    expect(await widgetPage.getElement(widgetPage.subSubItem2)).toBeVisible();
+  });
+
+  test('Select Menu test', async () => {
+    await widgetPage.clickElementForGetByRole(Constants.roles.listItemRole, Constants.textValues.selectMenu, widgetPage.selectMenuContainer);
+    await widgetPage.clickElement(widgetPage.selectValues);
+    await widgetPage.clickElementForText(Constants.textValues.groupOption);
+    await widgetPage.clickElement(widgetPage.selectOneMenu);
+    await widgetPage.clickElementForText(Constants.textValues.mr);
+    await widgetPage.selectOptionForDropdown(widgetPage.selectOldMenu, Constants.colours.blue);
+    await widgetPage.clickElementForText(Constants.textValues.select);
+    await widgetPage.selectAllElements(multiselectDropdownLocators);
+    await widgetPage.keyboardPress(Constants.textValues.control);
+    await widgetPage.selectOptionForDropdown(widgetPage.multiselect, Constants.options.saabAndOpel, true);
   });
 });

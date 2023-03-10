@@ -37,7 +37,7 @@ export default defineConfig({
   // reporter: process.env.CI ? 'github' : 'list',
   // reporter: [['@reportportal/agent-js-playwright', RPconfig]],
   use: {
-    actionTimeout: 30000,
+    actionTimeout: 15000,
     baseURL: 'https://demoqa.com',
     headless: false,
     trace: 'on',

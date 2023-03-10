@@ -30,6 +30,22 @@ export class WidgetPage {
     readonly tooltipDate: string;
     readonly tooltipContainer: string;
     readonly tooltipText: string;
+    readonly menuContainer: string;
+    readonly mainItem2: string;
+    readonly subItem: string;
+    readonly subSubList: string;
+    readonly subSubItem1: string;
+    readonly subSubItem2: string;
+    readonly selectMenuContainer: string;
+    readonly selectValues: string;
+    readonly selectOneMenu: string;
+    readonly greenOption: string;
+    readonly blueOption: string;
+    readonly blackOption: string;
+    readonly redOption: string;
+    readonly progressBar: string;
+    readonly selectOldMenu: string;
+    readonly multiselect: string;
 
     constructor(page: Page) {
         this.page = page;
@@ -59,7 +75,22 @@ export class WidgetPage {
         this.tooltipDate = "//div[@id='texToolTopContainer']/a[text()='1.10.32']";
         this.tooltipContainer = '#toopTipContainer';
         this.tooltipText = '.tooltip-inner';
-
+        this.menuContainer = '.row .col-12.mt-4.col-md-6';
+        this.mainItem2 = '//a[text()="Main Item 2"]';
+        this.subItem = '//a[text()="Sub Item"]';
+        this.subSubList = '//a[text()="SUB SUB LIST »"]';
+        this.subSubItem1 = '//a[text()="Sub Sub Item 1"]';
+        this.subSubItem2 = '//a[text()="Sub Sub Item 2"]';
+        this.selectMenuContainer = '#selectMenuContainer';
+        this.selectValues = '#withOptGroup';
+        this.selectOneMenu = '#selectOne';
+        this.selectOldMenu = '#oldSelectMenu';
+        this.multiselect = '#cars';
+        this.greenOption = '#react-select-4-option-0';
+        this.blueOption = '#react-select-4-option-1';
+        this.blackOption = '#react-select-4-option-2';
+        this.redOption = '#react-select-4-option-3';
+        this.progressBar = '//span[text()="Progress Bar"]';
         // this.contactDetailsLocators = {
         //     street1: '//label[text()="Street 1"]/../..//div/input'
         // }
@@ -88,7 +119,7 @@ export class WidgetPage {
     }
 
     async clickElementForGetByRole(role: any, visibleText: string, waitForLocator?: string) {
-        await this.page.getByRole(role).filter({ hasText: visibleText }).click();
+        await this.page.getByRole(role).filter({ hasText: visibleText }).first().click();
         if (waitForLocator) {
             await this.page.waitForSelector(waitForLocator);
         }
@@ -119,6 +150,15 @@ export class WidgetPage {
         }
         await this.fillValues(role, index, value);
         await this.clickOption();
+    }
+
+    async selectOptionForDropdown(locator, labelValue, isArray?: boolean) {
+        if (isArray) {
+            await this.page.locator(locator).selectOption([labelValue]);
+        }
+        else {
+            await this.page.locator(locator).selectOption({ label: labelValue });
+        }
     }
 
     async getSelectedValues(locator: string, isMultiple?: boolean) {
@@ -182,5 +222,28 @@ export class WidgetPage {
             let hoverValue = await this.getTooltipValue();
             expect(hoverValue).toEqual(tooltipValues[index]);
         }
+    }
+
+    async getSubItem() {
+        return this.page.locator(this.subItem).nth(1);
+    }
+
+    async getElement(locator) {
+        return this.page.locator(locator);
+    }
+
+    async selectAllElements(locators: any[]) {
+        for (let locator of locators) {
+            await this.clickElement(locator);
+        }
+        await this.scrollIntoView(this.progressBar);
+    }
+
+    async scrollIntoView(locator) {
+        await this.page.locator(locator).scrollIntoViewIfNeeded();
+    }
+
+    async keyboardPress(operation) {
+        await this.page.keyboard.press(operation);
     }
 }

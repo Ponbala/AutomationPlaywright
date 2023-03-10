@@ -26,6 +26,9 @@
         "blue": "Blue",
         "black": "Black"
     },
+    "options": {
+        "saabAndOpel": ["saab", "opel"]
+    },
     "textValues": {
         "accordian": "Accordian",
         "autoComplete": "Auto Complete",
@@ -39,7 +42,13 @@
         "previousMonth": "Previous Month",
         "selectedDate": "12/25/2023",
         "selectedDateTime": "February 7, 2023 10:45 AM",
-        "disabled": "disabled"
+        "disabled": "disabled",
+        "selectOption": "Select Option",
+        "selectTitle": "Select Title",
+        "groupOption": "Group 1, option 2",
+        "mr": "Mr.",
+        "select": "Select...",
+        "control": "Control"
     },
     "attribute": {
         "ariaSelected": "aria-selected",
