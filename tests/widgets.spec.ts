@@ -70,7 +70,7 @@ test.describe('Widgets', () => {
     await widgetPage.hoverAllElements(locators, tooltipValues);
   });
 
-  test('Tooltip test', async () => {
+  test('Menu test', async () => {
     await widgetPage.clickElementForGetByRole(Constants.roles.listItemRole, Constants.textValues.menu, widgetPage.menuContainer);
     await widgetPage.hoverElement(widgetPage.mainItem2);
     expect(await widgetPage.getSubItem()).toBeVisible();
@@ -90,5 +90,10 @@ test.describe('Widgets', () => {
     await widgetPage.selectAllElements(multiselectDropdownLocators);
     await widgetPage.keyboardPress(Constants.textValues.control);
     await widgetPage.selectOptionForDropdown(widgetPage.multiselect, Constants.options.saabAndOpel, true);
+  });
+
+  test('Accordian test', async () => {
+    await widgetPage.clickElementForGetByRole(Constants.roles.listItemRole, Constants.textValues.slider, widgetPage.sliderContainer);
+    await widgetPage.moveSlider();
   });
 });

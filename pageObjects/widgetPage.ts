@@ -46,6 +46,9 @@ export class WidgetPage {
     readonly progressBar: string;
     readonly selectOldMenu: string;
     readonly multiselect: string;
+    readonly sliderContainer: string;
+    readonly sliderInput: string;
+    readonly sliderValue: string;
 
     constructor(page: Page) {
         this.page = page;
@@ -91,9 +94,10 @@ export class WidgetPage {
         this.blackOption = '#react-select-4-option-2';
         this.redOption = '#react-select-4-option-3';
         this.progressBar = '//span[text()="Progress Bar"]';
-        // this.contactDetailsLocators = {
-        //     street1: '//label[text()="Street 1"]/../..//div/input'
-        // }
+        this.sliderContainer = '#sliderContainer';
+        this.sliderContainer = '#sliderContainer';
+        this.sliderInput = '.range-slider.range-slider--primary';
+        this.sliderValue = '.range-slider__tooltip__label';
     }
 
     async getBaseURL() {
@@ -245,5 +249,34 @@ export class WidgetPage {
 
     async keyboardPress(operation) {
         await this.page.keyboard.press(operation);
+    }
+
+    async getSliderValue() {
+        return await this.page.locator(this.sliderValue).textContent();
+    }
+
+    async moveSlider() {
+        let sliderElement = this.page.locator(this.sliderInput);
+        console.log('Initial value: ' + await this.getSliderValue());
+        let isCompleted = false;
+        let targetValue = '10';
+        if (sliderElement) {
+            while (!isCompleted) {
+                let srcBound = await sliderElement.boundingBox();
+                if (srcBound) {
+                    await this.page.mouse.move(srcBound.x + srcBound.width / 2, srcBound.y + srcBound.height / 2);
+                    await this.page.mouse.down();
+                    await this.page.waitForTimeout(2000);
+                    await this.page.mouse.move(srcBound.x + 55, srcBound.y + srcBound.height / 2);
+                    await this.page.mouse.up();
+                    await this.page.waitForTimeout(3000);
+                    let currentValue = await this.getSliderValue();
+                    console.log("Current Value", currentValue);
+                    if (currentValue == targetValue) {
+                        isCompleted = true;
+                    }
+                }
+            }
+        }
     }
 }
