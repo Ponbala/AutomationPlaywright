@@ -125,7 +125,7 @@ test.describe('Filling Personal details', () => {
 });
 
 test.describe('Filling Contact details', () => {
-  test('Filling the Address section fields', async () => {
+  test('Filling the Contact details section fields', async () => {
     await myInfoPage.clickMenu(myInfoPage.contactDetails, 'Contact Details');
     await myInfoPage.fillFieldValues(contactDetailsLocators, contactDetailValues);
     await myInfoPage.selecDropdownOption(myInfoPage.contactDetailsLocators.country, 'India');
