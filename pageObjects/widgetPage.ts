@@ -47,8 +47,12 @@ export class WidgetPage {
     readonly selectOldMenu: string;
     readonly multiselect: string;
     readonly sliderContainer: string;
+    readonly progressBarContainer: string;
     readonly sliderInput: string;
     readonly sliderValue: string;
+    readonly startStop: string;
+    readonly progressBarElement: string;
+    readonly progressBarValue: string;
 
     constructor(page: Page) {
         this.page = page;
@@ -95,9 +99,12 @@ export class WidgetPage {
         this.redOption = '#react-select-4-option-3';
         this.progressBar = '//span[text()="Progress Bar"]';
         this.sliderContainer = '#sliderContainer';
-        this.sliderContainer = '#sliderContainer';
+        this.progressBarContainer = '#progressBarContainer';
         this.sliderInput = '.range-slider.range-slider--primary';
         this.sliderValue = '.range-slider__tooltip__label';
+        this.startStop = '#startStopButton';
+        this.progressBarElement = '#progressBar';
+        this.progressBarValue = '.progress-bar';
     }
 
     async getBaseURL() {
@@ -140,6 +147,7 @@ export class WidgetPage {
     async clickOption() {
         await this.page.locator(this.autoCompleteOption).click();
     }
+    
     async clearTextboxValues(role: any, index: number) {
         await this.page.getByRole(role).nth(index).fill('');
     }
@@ -165,7 +173,7 @@ export class WidgetPage {
         }
     }
 
-    async getSelectedValues(locator: string, isMultiple?: boolean) {
+    async getValue(locator: string, isMultiple?: boolean) {
         if (isMultiple) {
             return await this.page.locator(locator).allTextContents();
         }
@@ -279,4 +287,23 @@ export class WidgetPage {
             }
         }
     }
+
+    async progressBarWidget() {
+        let progressBarElement = this.progressBarElement;
+        console.log('Initial value: ' + await this.getValue(this.progressBarValue));
+        let isCompleted = false;
+        let targetValue = '20%';
+        if (progressBarElement) {
+            while (!isCompleted) {
+                let currentValue = await this.getValue(this.progressBarValue);
+                console.log("Current Value", currentValue);
+                if (currentValue == targetValue) {
+                    await this.clickElement(this.startStop);
+                    isCompleted = true;
+                }
+            }
+        }
+    }
+
 }
+
