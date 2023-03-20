@@ -76,7 +76,7 @@ test.beforeAll(async ({ browser }) => {
 test.afterAll(async () => {
   await page.close();
 });
-
+/*
 test.describe('Filling Personal details', () => {
   test('Filling the names section', async () => {
     namesLocators = [myInfoPage.firstName, myInfoPage.middleName, myInfoPage.lastName, myInfoPage.nickName];
@@ -153,6 +153,25 @@ test.describe('Filling Dependents details', () => {
     await myInfoPage.fillTextBoxValues(myInfoPage.nameInputField, 'Gob');
     await myInfoPage.selecDropdownOption(myInfoPage.dependentsDetails.relationship, 'Child');
     await myInfoPage.fillDateValue(myInfoPage.dateofBirth, '2000-12-26');
+    await myInfoPage.clickSave(myInfoPage.save, 1, Constants.sucessMsg.sucessfulSavedMsg);
+    await myInfoPage.clickElementWithIndex(myInfoPage.addButton, 1);
+    await myInfoPage.uploadFile('uploadTextFile.txt', true);
+  });*/
+
+test.describe('Immigration details', () => {
+  test('Filling Immigration details', async () => {
+    await myInfoPage.clickMenu(myInfoPage.immigrationDetails.immigrationDetailsMenuLink, 'Immigration');
+    await myInfoPage.clickElementWithIndex(myInfoPage.addButton, 0);
+    await page.waitForSelector(myInfoPage.container);
+    await myInfoPage.click(myInfoPage.immigrationDetails.passportOption);
+    await myInfoPage.fillDateValue(myInfoPage.immigrationDetails.issuedDate, '2023-03-10');
+    await myInfoPage.fillDateValue(myInfoPage.immigrationDetails.expiryDate, '2023-03-28');
+    await myInfoPage.fillTextBoxValues(myInfoPage.immigrationDetails.eligibleStatus, 'Active');
+    await myInfoPage.selecDropdownOption(myInfoPage.immigrationDetails.issuedBy, 'Albania');
+    await myInfoPage.fillDateValue(myInfoPage.immigrationDetails.eligibleReviewDate, '2023-03-28');
+    await myInfoPage.fillTextBoxValues(myInfoPage.immigrationDetails.comments, '1234567');
+    await page.waitForTimeout(4000);
+    await myInfoPage.copyPaste(myInfoPage.immigrationDetails.comments, myInfoPage.immigrationDetails.number);
     await myInfoPage.clickSave(myInfoPage.save, 1, Constants.sucessMsg.sucessfulSavedMsg);
     await myInfoPage.clickElementWithIndex(myInfoPage.addButton, 1);
     await myInfoPage.uploadFile('uploadTextFile.txt', true);

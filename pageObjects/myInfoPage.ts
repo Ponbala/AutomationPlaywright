@@ -43,6 +43,7 @@ export class MyInfoPage {
     readonly container: string;
     readonly nameInputField: string;
     readonly dependentsDetails: any;
+    readonly immigrationDetails: any;
 
     constructor(page: Page) {
         this.page = page;
@@ -106,8 +107,20 @@ export class MyInfoPage {
         this.dependentsDetails = {
             dependentsMenuLink: `//a[text()="Dependents"]`,
             relationship: '//label[text()="Relationship"]/../../..//div[@class="oxd-select-text--after"]'
+        }
+        this.immigrationDetails = {
+            immigrationDetailsMenuLink: '//a[text()="Immigration"]',
+            passportOption: '//div[@class="oxd-radio-wrapper"]//input[@value="1"]',
+            number: '//label[text()="Number"]/../..//input[@class="oxd-input oxd-input--active"]',
+            issuedDate: '//label[text()="Issued Date"]/../..//input[@class="oxd-input oxd-input--active"]',
+            expiryDate: '//label[text()="Expiry Date"]/../..//input[@class="oxd-input oxd-input--active"]',
+            eligibleStatus: '//label[text()="Eligible Status"]/../..//input[@class="oxd-input oxd-input--active"]',
+            issuedBy: "//label[text()='Issued By']/../../..//div[@class='oxd-select-text oxd-select-text--active']",
+            eligibleReviewDate: '//label[text()="Eligible Review Date"]/../..//input[@class="oxd-input oxd-input--active"]',
+            comments: '[placeholder="Type Comments here"]',
+            comment: '[placeholder="Type comment here"]',
+        }
     }
-}
 
     async clearTextBoxValues(locatorValue: any) {
         await this.page.locator(locatorValue).fill('');
@@ -161,7 +174,7 @@ export class MyInfoPage {
         //     await filechooser.setFiles('uploadTextFile.txt')
         //   });
         await this.page.setInputFiles(this.uploadElement, filePath);
-        await this.fillTextBoxValues(this.commentBox, Constants.fillText.comment);
+        await this.fillTextBoxValues(this.immigrationDetails.comment, Constants.fillText.comment);
         await this.page.waitForTimeout(3000);
         if (value) {
             await this.page.locator(this.save).last().click();
@@ -209,7 +222,7 @@ export class MyInfoPage {
         await this.page.waitForTimeout(5000);
     };
 
-    async clickMenu(locator, menuLink){
+    async clickMenu(locator, menuLink) {
         await this.page.waitForSelector(locator);
         await this.page.getByRole('link', { name: menuLink }).click();
         await this.page.waitForSelector(this.container);
@@ -240,5 +253,11 @@ export class MyInfoPage {
             await this.fillTextBoxValues(locator, values[index]);
             await this.page.waitForTimeout(3000);
         };
+    }
+
+    async copyPaste(sourceLocator, destinationLocator) {
+        await this.page.locator(sourceLocator).dblclick();
+        await this.page.locator(sourceLocator).press('Control+C');
+        await this.page.locator(destinationLocator).press('Control+V');
     }
 }
