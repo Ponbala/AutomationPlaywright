@@ -76,8 +76,8 @@ test.beforeAll(async ({ browser }) => {
 test.afterAll(async () => {
   await page.close();
 });
-/*
-test.describe('Filling Personal details', () => {
+
+test.describe('Personal details', () => {
   test('Filling the names section', async () => {
     namesLocators = [myInfoPage.firstName, myInfoPage.middleName, myInfoPage.lastName, myInfoPage.nickName];
     await myInfoPage.fillFieldValues(namesLocators, nameValues);
@@ -101,11 +101,11 @@ test.describe('Filling Personal details', () => {
   });
 
   test('Filling the personal details and verifying cancel button', async () => {
-    await myInfoPage.uploadFile('uploadTextFile.txt', false);
+    await myInfoPage.uploadFile('uploadTextFile.txt', 'Attachments', false);
   });
 
   test('Filling the personal details and verifying save button', async () => {
-    await myInfoPage.uploadFile('uploadTextFile.txt', true);
+    await myInfoPage.uploadFile('uploadTextFile.txt', 'Attachments', true);
     let table = page.locator(myInfoPage.table);
     await page.waitForTimeout(5000);
     expect(table).toBeVisible();
@@ -118,13 +118,13 @@ test.describe('Filling Personal details', () => {
   });
 
   test('Uploading a new file and checking the checkbox and performing delete operation', async () => {
-    await myInfoPage.uploadFile('uploadTextFile.txt', true);
+    await myInfoPage.uploadFile('uploadTextFile.txt', 'Attachments', true);
     await myInfoPage.deleteAttachedFile("cancel");
     await myInfoPage.deleteAttachedFile("save");
   });
 });
 
-test.describe('Filling Contact details', () => {
+test.describe('Contact details', () => {
   test('Filling the Contact details section fields', async () => {
     await myInfoPage.clickMenu(myInfoPage.contactDetails, 'Contact Details');
     await myInfoPage.fillFieldValues(contactDetailsLocators, contactDetailValues);
@@ -133,36 +133,34 @@ test.describe('Filling Contact details', () => {
   });
 });
 
-test.describe('Filling Emergency Contacts details', () => {
+test.describe('Emergency Contacts', () => {
   test('Filling Emergency Contacts details', async () => {
     await myInfoPage.clickEmergencyContactsMenu();
     await myInfoPage.clickMenu(myInfoPage.emergencyContactDetails.emergencyContactMenuLink, 'Emergency Contacts');
-    await myInfoPage.clickElementWithIndex(myInfoPage.addButton, 0);
+    await myInfoPage.clickAddButton('Assigned Emergency Contacts');
     await myInfoPage.fillFieldValues(emergencyContactLocators, emergencyContactValues);
     await myInfoPage.clickSave(myInfoPage.save, 1, Constants.sucessMsg.sucessfulSavedMsg);
-    await myInfoPage.clickElementWithIndex(myInfoPage.addButton, 1);
-    await myInfoPage.uploadFile('uploadTextFile.txt', true);
+    await myInfoPage.uploadFile('uploadTextFile.txt', 'Attachments', true);
   });
 });
 
-test.describe('Filling Dependents details', () => {
+test.describe('Dependents', () => {
   test('Filling Dependents details', async () => {
     await myInfoPage.clickMenu(myInfoPage.dependentsDetails.dependentsMenuLink, 'Dependents');
-    await myInfoPage.clickElementWithIndex(myInfoPage.addButton, 0);
+    await myInfoPage.clickAddButton('Assigned Dependents');
     await myInfoPage.clearTextBoxValues(myInfoPage.nameInputField);
     await myInfoPage.fillTextBoxValues(myInfoPage.nameInputField, 'Gob');
     await myInfoPage.selecDropdownOption(myInfoPage.dependentsDetails.relationship, 'Child');
     await myInfoPage.fillDateValue(myInfoPage.dateofBirth, '2000-12-26');
     await myInfoPage.clickSave(myInfoPage.save, 1, Constants.sucessMsg.sucessfulSavedMsg);
-    await myInfoPage.clickElementWithIndex(myInfoPage.addButton, 1);
-    await myInfoPage.uploadFile('uploadTextFile.txt', true);
-  });*/
+    await myInfoPage.uploadFile('uploadTextFile.txt', 'Attachments', true);
+  });
+});
 
-test.describe('Immigration details', () => {
+test.describe('Immigration', () => {
   test('Filling Immigration details', async () => {
     await myInfoPage.clickMenu(myInfoPage.immigrationDetails.immigrationDetailsMenuLink, 'Immigration');
-    await myInfoPage.clickElementWithIndex(myInfoPage.addButton, 0);
-    await page.waitForSelector(myInfoPage.container);
+    await myInfoPage.clickAddButton('Assigned Immigration Records');
     await myInfoPage.click(myInfoPage.immigrationDetails.passportOption);
     await myInfoPage.fillDateValue(myInfoPage.immigrationDetails.issuedDate, '2023-03-10');
     await myInfoPage.fillDateValue(myInfoPage.immigrationDetails.expiryDate, '2023-03-28');
@@ -173,7 +171,77 @@ test.describe('Immigration details', () => {
     await page.waitForTimeout(4000);
     await myInfoPage.copyPaste(myInfoPage.immigrationDetails.comments, myInfoPage.immigrationDetails.number);
     await myInfoPage.clickSave(myInfoPage.save, 1, Constants.sucessMsg.sucessfulSavedMsg);
-    await myInfoPage.clickElementWithIndex(myInfoPage.addButton, 1);
-    await myInfoPage.uploadFile('uploadTextFile.txt', true);
+    await myInfoPage.uploadFile('uploadTextFile.txt', 'Attachments', true);
+  });
+});
+
+test.describe('Qualification', () => {
+  test('Filling Work Experience details', async () => {
+    await myInfoPage.clickMenu(myInfoPage.qualificationsMenuLink, 'Qualifications');
+    await myInfoPage.clickAddButton('Work Experience');
+    await myInfoPage.fillTextBoxValues(myInfoPage.workExperience.company, 'AM');
+    await myInfoPage.fillTextBoxValues(myInfoPage.workExperience.jobTitle, 'Software Engineer');
+    await myInfoPage.fillDateValue(myInfoPage.workExperience.fromDate, '2019-02-23');
+    await myInfoPage.fillDateValue(myInfoPage.workExperience.toDate, '2025-02-23');
+    await myInfoPage.fillTextBoxValues(myInfoPage.workExperience.comment, 'Filled Work Experience fields');
+    await myInfoPage.clickSave(myInfoPage.save, 1, Constants.sucessMsg.sucessfulSavedMsg);
+  });
+
+  test('Filling Education details', async () => {
+    await myInfoPage.clickAddButton('Education');
+    await myInfoPage.selecDropdownOption(myInfoPage.education.level, "Bachelor's Degree");
+    await myInfoPage.fillTextBoxValues(myInfoPage.education.institute, 'STC');
+    await myInfoPage.fillTextBoxValues(myInfoPage.education.majorOrSpecialization, 'BSC');
+    await myInfoPage.fillTextBoxValues(myInfoPage.education.year, '2015');
+    await myInfoPage.fillTextBoxValues(myInfoPage.education.gpaScore, '7.2');
+    await myInfoPage.fillTextBoxValues(myInfoPage.education.startDate, '2012-04-15');
+    await myInfoPage.fillTextBoxValues(myInfoPage.education.endDate, '2015-04-15');
+    await myInfoPage.clickSave(myInfoPage.save, 1);
+  });
+
+  test('Filling Skills details', async () => {
+    await myInfoPage.clickAddButton('Skills');
+    await myInfoPage.selecDropdownOption(myInfoPage.skills.skill, "Java");
+    await myInfoPage.fillTextBoxValues(myInfoPage.skills.yearsOfExperience, '4');
+    await myInfoPage.fillTextBoxValues(myInfoPage.skills.comment, 'Filled Skills fields');
+    await myInfoPage.clickSave(myInfoPage.save, 1);
+  });
+
+  test('Filling Languages details', async () => {
+    await myInfoPage.clickAddButton('Languages');
+    await page.waitForTimeout(3000);
+    await myInfoPage.selecDropdownOption(myInfoPage.languages.language, "English");
+    await myInfoPage.selecDropdownOption(myInfoPage.languages.fluency, "Writing");
+    await myInfoPage.selecDropdownOption(myInfoPage.languages.competency, "Good");
+    await myInfoPage.fillTextBoxValues(myInfoPage.languages.comment, 'Filled Languages fields');
+    await myInfoPage.clickSave(myInfoPage.save, 1);
+  });
+
+  test('Filling License details', async () => {
+    await myInfoPage.clickAddButton('License');
+    await myInfoPage.selecDropdownOption(myInfoPage.license.licenseType, "Cisco Certified Network Associate (CCNA)");
+    await myInfoPage.fillTextBoxValues(myInfoPage.license.licenseNumber, "123456");
+    await myInfoPage.fillTextBoxValues(myInfoPage.license.issuedDate, '2015-04-15');
+    await myInfoPage.fillTextBoxValues(myInfoPage.license.expiryDate, '2015-05-15');
+    await myInfoPage.clickSave(myInfoPage.save, 1);
+  });
+
+  test('Attachment section', async () => {
+    await myInfoPage.uploadFile('uploadTextFile.txt', 'Attachments', true);
+  });
+});
+
+test.describe('Memberships', () => {
+  test('Filling Assigned Memberships details', async () => {
+    await myInfoPage.clickMenu(myInfoPage.memberships.membershipMenuLink, 'Memberships');
+    await myInfoPage.clickAddButton('Assigned Memberships');
+    await myInfoPage.selecDropdownOption(myInfoPage.memberships.membership, "ACCA");
+    await myInfoPage.selecDropdownOption(myInfoPage.memberships.subscriptionPaidBy, "Company");
+    await myInfoPage.fillTextBoxValues(myInfoPage.memberships.subscriptionAmount, "42000");
+    await myInfoPage.selecDropdownOption(myInfoPage.memberships.currency, "Indian Rupee");
+    await myInfoPage.fillTextBoxValues(myInfoPage.memberships.subscriptionCommenceDate, "2023-03-21");
+    await myInfoPage.fillTextBoxValues(myInfoPage.memberships.subscriptionRenewalDate, "2023-03-23");
+    await myInfoPage.clickSave(myInfoPage.save, 1);
+    await myInfoPage.uploadFile('uploadTextFile.txt', 'Attachments', true);
   });
 });

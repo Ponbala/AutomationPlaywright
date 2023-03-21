@@ -23,7 +23,6 @@ export class MyInfoPage {
     readonly toastMessage: string;
     readonly closeIcon: string;
     readonly bloodType: string;
-    readonly addButton: string;
     readonly browseButton: string;
     readonly uploadElement: string;
     readonly commentBox: string;
@@ -44,6 +43,15 @@ export class MyInfoPage {
     readonly nameInputField: string;
     readonly dependentsDetails: any;
     readonly immigrationDetails: any;
+    readonly workExperience: any;
+    readonly qualificationComment: string;
+    readonly education: any;
+    readonly skills: any;
+    readonly languages: any;
+    readonly license: any;
+    readonly qualificationsMenuLink: any;
+    readonly addBtn: any;
+    readonly memberships: any;
 
     constructor(page: Page) {
         this.page = page;
@@ -67,7 +75,6 @@ export class MyInfoPage {
         this.toastMessage = 'p.oxd-text--toast-message';
         this.closeIcon = '.oxd-toast-close-container';
         this.bloodType = `//label[text()='Blood Type']/../..//*[@class='oxd-select-wrapper']/div`;
-        this.addButton = 'button.oxd-button--text';
         this.browseButton = '//div[text()="Browse"]';
         this.uploadElement = '.oxd-file-input';
         this.commentBox = 'textarea.oxd-textarea';
@@ -120,6 +127,60 @@ export class MyInfoPage {
             comments: '[placeholder="Type Comments here"]',
             comment: '[placeholder="Type comment here"]',
         }
+        this.workExperience = {
+            company: '//label[text()="Company"]/../..//div/input',
+            jobTitle: '//label[text()="Job Title"]/../..//div/input',
+            fromDate: '//label[text()="From"]/../..//input',
+            toDate: '//label[text()="To"]/../..//input',
+            comment: '//h6[.="Add Work Experience"]/..//textarea'
+        }
+        this.qualificationsMenuLink = '//a[text()="Qualifications"]',
+            this.qualificationComment = '.oxd-input-group .oxd-textarea';
+        this.education = {
+            level: "//label[text()='Level']/../../..//div[@class='oxd-select-text oxd-select-text--active']",
+            institute: "//label[text()='Institute']/../..//input",
+            majorOrSpecialization: "//label[text()='Major/Specialization']/../..//input",
+            year: "//label[text()='Year']/../..//input",
+            gpaScore: "//label[text()='GPA/Score']/../..//input",
+            startDate: "//label[text()='Start Date']/../..//input",
+            endDate: "//label[text()='End Date']/../..//input"
+        }
+        this.skills = {
+            skill: "//label[text()='Skill']/../../..//div[@class='oxd-select-text oxd-select-text--active']",
+            yearsOfExperience: "//label[text()='Years of Experience']/../..//input",
+            comment: '//h6[.="Add Skill"]/..//textarea'
+        }
+        this.languages = {
+            language: "//label[text()='Language']/../../..//div[@class='oxd-select-text-input']",
+            fluency: "//label[text()='Fluency']/../../..//div[@class='oxd-select-text-input']",
+            competency: "//label[text()='Competency']/../../..//div[@class='oxd-select-text-input']",
+            comment: '//h6[.="Add Language"]/..//textarea'
+        }
+        this.license = {
+            licenseType: "//label[text()='License Type']/../../..//div[@class='oxd-select-text-input']",
+            licenseNumber: "//label[text()='License Number']/../..//input",
+            issuedDate: "//label[text()='Issued Date']/../..//input",
+            expiryDate: "//label[text()='Expiry Date']/../..//input"
+        }
+        this.addBtn = (section: any) => {
+            return `//h6[text()='${section}']/following-sibling::button`;
+        }
+        this.memberships = {
+            membershipMenuLink: "//a[text()='Memberships']",
+            membership: "//label[text()='Membership']/../../..//div[@class='oxd-select-text-input']",
+            subscriptionPaidBy: "//label[text()='Subscription Paid By']/../../..//div[@class='oxd-select-text-input']",
+            currency: "//label[text()='Currency']/../../..//div[@class='oxd-select-text-input']",
+            subscriptionAmount: "//label[text()='Subscription Amount']/../..//input",
+            subscriptionCommenceDate: "//label[text()='Subscription Commence Date']/../..//input",
+            subscriptionRenewalDate: "//label[text()='Subscription Renewal Date']/../..//input"
+        }
+    }
+
+    async clickAddButton(section: string) {
+        let element = await this.addBtn(section);
+        let addButton = this.page.locator(element);
+        await addButton.click();
+        await this.page.waitForSelector(this.container);
     }
 
     async clearTextBoxValues(locatorValue: any) {
@@ -146,9 +207,11 @@ export class MyInfoPage {
     };
 
     async clickSave(locatorValue: string, index: number, messageToVerify?: string) {
-        await this.page.locator(locatorValue).nth(index).click();
-        expect(await this.getToastMessage()).toEqual(messageToVerify);
-        await this.clickCloseIcon();
+        await this.page.locator(locatorValue).nth(index).click({ force: true });
+        if (messageToVerify) {
+            expect(await this.getToastMessage()).toEqual(messageToVerify);
+            await this.clickCloseIcon();
+        }
     }
 
     async getToastMessage() {
@@ -167,8 +230,8 @@ export class MyInfoPage {
         await this.page.locator(locatorValue).nth(index).click();
     }
 
-    async uploadFile(filePath: any, value: boolean) {
-        await this.click(this.addButton);
+    async uploadFile(filePath: any, section: string, save: boolean) {
+        await this.clickAddButton(section);
         await this.page.waitForSelector(this.browseButton);
         // this.page.on("filechooser", async (filechooser) => {
         //     await filechooser.setFiles('uploadTextFile.txt')
@@ -176,7 +239,7 @@ export class MyInfoPage {
         await this.page.setInputFiles(this.uploadElement, filePath);
         await this.fillTextBoxValues(this.immigrationDetails.comment, Constants.fillText.comment);
         await this.page.waitForTimeout(3000);
-        if (value) {
+        if (save) {
             await this.page.locator(this.save).last().click();
             expect(await this.getToastMessage()).toEqual(Constants.sucessMsg.sucessfulSavedMsg);
             await this.clickCloseIcon();
