@@ -206,12 +206,18 @@ export class MyInfoPage {
         await this.page.getByRole('option', { name: optionValue }).getByText(optionValue, { exact: true }).click();
     };
 
+    async selecDropdownOptionWithRole(locator: any, optionValue: any) {
+        await this.click(locator);
+        await this.page.getByRole('listbox').getByText(optionValue, { exact: true }).click();
+    };
+
     async clickSave(locatorValue: string, index: number, messageToVerify?: string) {
         await this.page.locator(locatorValue).nth(index).click({ force: true });
         if (messageToVerify) {
             expect(await this.getToastMessage()).toEqual(messageToVerify);
             await this.clickCloseIcon();
         }
+        await this.page.waitForTimeout(2000);
     }
 
     async getToastMessage() {

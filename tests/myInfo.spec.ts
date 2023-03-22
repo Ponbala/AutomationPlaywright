@@ -70,7 +70,7 @@ test.beforeAll(async ({ browser }) => {
   await loginPage.fillUsrNameAndPwdAndLogin(ENV.USERNAME, pass);
   await expect(page).toHaveURL(/.*dashboard/);
   await page.waitForSelector(homePage.dashboardGrid);
-  await homePage.clickMyInfoMenu();
+  await homePage.clickMenu(homePage.myInfo,"link","My Info");
 });
 
 test.afterAll(async () => {

@@ -10,6 +10,12 @@
     "TitleVerification": {
         "loginPageTitle": "OrangeHRM"
     },
+    "Roles":{
+        "link": "link",
+        "menuItem": "menuitem",
+        "option": "option",
+        "dropdown": "dropdown"
+    },
     "sucessMsg": {
         "successfulUpdatedMsg": "Successfully Updated",
         "successfulDeletedMsg": "Successfully Deleted",

@@ -15,4 +15,9 @@ export class Utils {
       webkit.launch(),
     ]);
   }
+
+  async waitForSpinnerToDisappear() {
+    const spinner = this.page.waitForSelector('.oxd-loading-spinner');
+    (await spinner).waitForElementState("hidden");
+}
 }
