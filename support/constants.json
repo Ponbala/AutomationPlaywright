@@ -10,11 +10,43 @@
     "TitleVerification": {
         "loginPageTitle": "OrangeHRM"
     },
-    "Roles":{
+    "Roles": {
         "link": "link",
         "menuItem": "menuitem",
         "option": "option",
         "dropdown": "dropdown"
+    },
+    "EmployeeName": {
+        "firstName": "Pon",
+        "middleName": "L",
+        "lastName": "Balan",
+        "nickName": "Agilesh"
+    },
+    "EmployeeIDs": {
+        "employeeId": "10",
+        "otherId": "11",
+        "driverLicenseNumber": "123",
+        "ssnNumber": "110",
+        "sinNumber": "111"
+    },
+    "EmployeeContactDetails": {
+        "street1": "KLS",
+        "street2": "Mak",
+        "city": "Pol",
+        "state": "TN",
+        "zip": "600097",
+        "home": "7777777771",
+        "mobile": "777777772",
+        "work": "7777777773",
+        "workEmail": "pon@hrm.com",
+        "otherEmail": "ba@hrm.com"
+    },
+    "EmergencyContacts": {
+        "name": "Lin",
+        "relationship": "Father",
+        "homeTelephone": "7246363727",
+        "mobile": "777777777",
+        "workTelephone": "77777776"
     },
     "sucessMsg": {
         "successfulUpdatedMsg": "Successfully Updated",

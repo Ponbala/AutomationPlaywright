@@ -17,7 +17,7 @@ export class Utils {
   }
 
   async waitForSpinnerToDisappear() {
-    const spinner = this.page.waitForSelector('.oxd-loading-spinner');
-    (await spinner).waitForElementState("hidden");
+    const spinner = await this.page.waitForSelector('.oxd-loading-spinner');
+    await spinner.waitForElementState("hidden");
 }
 }

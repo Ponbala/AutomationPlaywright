@@ -1,97 +1,78 @@
 import { Page, expect } from "@playwright/test";
+import { Utils } from "../support/utils";
 import Constants from '../support/constants.json';
+
+let utils: Utils;
 
 export class MyInfoPage {
     readonly page: Page;
-    readonly firstName: string;
-    readonly middleName: string;
-    readonly lastName: string;
-    readonly nickName: string;
-    readonly employeeId: string;
-    readonly otherId: string;
-    readonly driverLicenseNumber: string;
-    readonly licenseExpiryDate: string;
-    readonly ssnNumber: string;
-    readonly sinNumber: string;
-    readonly nationality: string;
-    readonly maritalStatus: string;
-    readonly dateofBirth: string;
-    readonly gender: string;
-    readonly militaryService: string;
-    readonly smoker: string;
     readonly save: string;
-    readonly toastMessage: string;
-    readonly closeIcon: string;
-    readonly bloodType: string;
-    readonly browseButton: string;
-    readonly uploadElement: string;
-    readonly commentBox: string;
-    readonly cancel: string;
-    readonly noRecordsText: string;
-    readonly attachmentCheckBox: string;
-    readonly deleteSelectedButton: string;
-    readonly deleteIcon: string;
-    readonly confirmationPopup: string;
-    readonly popupText: string;
-    readonly attachemtRow: string;
-    readonly table: string;
-    readonly popupDeleteButton: string;
-    readonly contactDetailsLocators: any;
-    readonly contactDetails: string;
-    readonly emergencyContactDetails: any;
     readonly container: string;
+    readonly backgroundContainer: string;
     readonly nameInputField: string;
+    readonly myInfoPersonalDetails: any;
+    readonly toastElements: any;
+    readonly attachments: any;
+    readonly contactDetailsLocators: any;
+    readonly myInfoContactDetails: any;
+    readonly emergencyContactDetails: any;
     readonly dependentsDetails: any;
     readonly immigrationDetails: any;
     readonly workExperience: any;
-    readonly qualificationComment: string;
     readonly education: any;
     readonly skills: any;
     readonly languages: any;
     readonly license: any;
-    readonly qualificationsMenuLink: any;
+    readonly qualifications: any;
     readonly addBtn: any;
     readonly memberships: any;
 
     constructor(page: Page) {
         this.page = page;
-        this.firstName = 'input.orangehrm-firstname';
-        this.middleName = 'input.orangehrm-middlename';
-        this.lastName = 'input.orangehrm-lastname';
-        this.nickName = '//label[text()="Nickname"]/../..//div/input';
-        this.employeeId = `//label[text()='Employee Id']/../..//div/input`;
-        this.otherId = `//label[text()='Other Id']/../..//div/input`;
-        this.driverLicenseNumber = `//label[text()="Driver's License Number"]/../..//div/input`;
-        this.licenseExpiryDate = `//label[text()='License Expiry Date']/../..//div/input`;
-        this.ssnNumber = '//label[text()="SSN Number"]/../..//div/input';
-        this.sinNumber = '//label[text()="SIN Number"]/../..//div/input'
-        this.nationality = `//label[text()='Nationality']/../../..//div[@class='oxd-select-text--after']`
-        this.maritalStatus = `//label[text()='Marital Status']/../../..//div[@class='oxd-select-text--after']`
-        this.dateofBirth = `//label[text()='Date of Birth']/../..//div/input`;
-        this.gender = '//label[text()="Gender"]/../../..//div[@class="oxd-radio-wrapper"]/label/input[@value="1"]';
-        this.militaryService = `//label[text()='Military Service']/../..//div/input`;
-        this.smoker = `//label[text()='Smoker']/../../..//div/label/input[@type='checkbox']`;
+        utils = new Utils(page);
         this.save = 'button.oxd-button--medium';
-        this.toastMessage = 'p.oxd-text--toast-message';
-        this.closeIcon = '.oxd-toast-close-container';
-        this.bloodType = `//label[text()='Blood Type']/../..//*[@class='oxd-select-wrapper']/div`;
-        this.browseButton = '//div[text()="Browse"]';
-        this.uploadElement = '.oxd-file-input';
-        this.commentBox = 'textarea.oxd-textarea';
-        this.cancel = '.oxd-form-actions button[type="button"]';
-        this.noRecordsText = '.orangehrm-horizontal-padding .oxd-text.oxd-text--span';
-        this.attachmentCheckBox = "(//i[contains(@class,'oxd-icon bi-check')])[2]";
-        this.deleteSelectedButton = 'button.orangehrm-horizontal-margin';
-        this.deleteIcon = 'i.oxd-icon.bi-trash';
-        this.confirmationPopup = 'div.orangehrm-dialog-popup';
-        this.popupText = 'p.oxd-text--card-body';
-        this.attachemtRow = 'div.oxd-table-card';
-        this.table = '.oxd-table-body';
-        this.popupDeleteButton = '(//div[@class="orangehrm-modal-footer"]//button)[2]';
-        this.contactDetails = '//a[text()="Contact Details"]';
         this.container = '.orangehrm-edit-employee-content';
+        this.backgroundContainer = '.orangehrm-background-container';
         this.nameInputField = '//label[text()="Name"]/../..//div/input';
+        this.myInfoPersonalDetails = {
+            firstName: 'input.orangehrm-firstname',
+            middleName: 'input.orangehrm-middlename',
+            lastName: 'input.orangehrm-lastname',
+            nickName: '//label[text()="Nickname"]/../..//div/input',
+            employeeId: `//label[text()='Employee Id']/../..//div/input`,
+            otherId: `//label[text()='Other Id']/../..//div/input`,
+            driverLicenseNumber: `//label[text()="Driver's License Number"]/../..//div/input`,
+            licenseExpiryDate: `//label[text()='License Expiry Date']/../..//div/input`,
+            ssnNumber: '//label[text()="SSN Number"]/../..//div/input',
+            sinNumber: '//label[text()="SIN Number"]/../..//div/input',
+            nationality: `//label[text()='Nationality']/../../..//div[@class='oxd-select-text--after']`,
+            maritalStatus: `//label[text()='Marital Status']/../../..//div[@class='oxd-select-text--after']`,
+            dateofBirth: `//label[text()='Date of Birth']/../..//div/input`,
+            gender: '//label[text()="Gender"]/../../..//div[@class="oxd-radio-wrapper"]/label/input[@value="1"]',
+            militaryService: `//label[text()='Military Service']/../..//div/input`,
+            smoker: `//label[text()='Smoker']/../../..//div/label/input[@type='checkbox']`,
+            bloodType: `//label[text()='Blood Type']/../..//*[@class='oxd-select-wrapper']/div`
+        }
+        this.toastElements = {
+            toastMessage: 'p.oxd-text--toast-message',
+            closeIcon: '.oxd-toast-close-container'
+        }
+        this.attachments = {
+            browseButton: '//div[text()="Browse"]',
+            uploadElement: '.oxd-file-input',
+            cancel: '.oxd-form-actions button[type="button"]',
+            noRecordsText: '.orangehrm-horizontal-padding .oxd-text.oxd-text--span',
+            attachmentCheckBox: "(//i[contains(@class,'oxd-icon bi-check')])[2]",
+            deleteSelectedButton: 'button.orangehrm-horizontal-margin',
+            deleteIcon: 'i.oxd-icon.bi-trash',
+            confirmationPopup: 'div.orangehrm-dialog-popup',
+            popupText: 'p.oxd-text--card-body',
+            attachemtRow: 'div.oxd-table-card',
+            table: '.oxd-table-body',
+            popupDeleteButton: '(//div[@class="orangehrm-modal-footer"]//button)[2]'
+        }
         this.contactDetailsLocators = {
+            contactDetails: '//a[text()="Contact Details"]',
             street1: '//label[text()="Street 1"]/../..//div/input',
             street2: '//label[text()="Street 2"]/../..//div/input',
             city: '//label[text()="City"]/../..//div/input',
@@ -134,8 +115,10 @@ export class MyInfoPage {
             toDate: '//label[text()="To"]/../..//input',
             comment: '//h6[.="Add Work Experience"]/..//textarea'
         }
-        this.qualificationsMenuLink = '//a[text()="Qualifications"]',
-            this.qualificationComment = '.oxd-input-group .oxd-textarea';
+        this.qualifications = {
+            qualificationsMenuLink: '//a[text()="Qualifications"]',
+            qualificationComment: '.oxd-input-group .oxd-textarea'
+        }
         this.education = {
             level: "//label[text()='Level']/../../..//div[@class='oxd-select-text oxd-select-text--active']",
             institute: "//label[text()='Institute']/../..//input",
@@ -162,9 +145,6 @@ export class MyInfoPage {
             issuedDate: "//label[text()='Issued Date']/../..//input",
             expiryDate: "//label[text()='Expiry Date']/../..//input"
         }
-        this.addBtn = (section: any) => {
-            return `//h6[text()='${section}']/following-sibling::button`;
-        }
         this.memberships = {
             membershipMenuLink: "//a[text()='Memberships']",
             membership: "//label[text()='Membership']/../../..//div[@class='oxd-select-text-input']",
@@ -174,156 +154,161 @@ export class MyInfoPage {
             subscriptionCommenceDate: "//label[text()='Subscription Commence Date']/../..//input",
             subscriptionRenewalDate: "//label[text()='Subscription Renewal Date']/../..//input"
         }
+        this.addBtn = (section: any) => {
+            return `//h6[text()='${section}']/following-sibling::button`;
+        }
     }
 
+    // This function is used to "click on Add button"
     async clickAddButton(section: string) {
+        await (await this.page.waitForSelector(`//h6[text()='${section}']/following-sibling::button`)).waitForElementState("stable");
         let element = await this.addBtn(section);
         let addButton = this.page.locator(element);
         await addButton.click();
-        await this.page.waitForSelector(this.container);
+        await (await this.page.waitForSelector(this.container)).waitForElementState("stable");
     }
 
+    // This function is used to "clear" the "textbox" values
     async clearTextBoxValues(locatorValue: any) {
+        await (await this.page.waitForSelector(locatorValue)).waitForElementState('editable');
         await this.page.locator(locatorValue).fill('');
-        await this.page.waitForTimeout(1000);
     };
 
+    // This function is used to verify the presence of "Delete" button and return the boolean value
     async isDeleteButtonPresent() {
-        return await this.page.locator(this.deleteSelectedButton).isVisible();
+        return await this.page.locator(this.attachments.deleteSelectedButton).isVisible();
     }
 
+    // This function is used to fill the "textbox" values
     async fillTextBoxValues(locatorValue: any, fillValue: any) {
-        await (await this.page.waitForSelector(locatorValue)).waitForElementState("stable");
+        await (await this.page.waitForSelector(locatorValue)).waitForElementState("editable");
         await this.page.locator(locatorValue).type(fillValue);
     };
 
+    // This function is used to fill the "Date" textbox values
     async fillDateValue(locatorValue: any, fillValue: any) {
         await this.page.locator(locatorValue).fill(fillValue);
     };
 
-    async selecDropdownOption(locator: any, optionValue: any) {
+    // This function is used to click the dropdown and "select the passed value"
+    async selecDropdownOption(role: any, locator: any, optionValue: any) {
         await this.click(locator);
-        await this.page.getByRole('option', { name: optionValue }).getByText(optionValue, { exact: true }).click();
+        await this.page.getByRole(role, { name: optionValue }).getByText(optionValue, { exact: true }).click();
     };
 
+    // This function is used to click the dropdown and select the passed value for "listbox" type element
     async selecDropdownOptionWithRole(locator: any, optionValue: any) {
         await this.click(locator);
-        await this.page.getByRole('listbox').getByText(optionValue, { exact: true }).click();
+        await this.page.getByRole('listbox', { name: optionValue }).click();
     };
 
+    // This function is used to click on the "Save" button
     async clickSave(locatorValue: string, index: number, messageToVerify?: string) {
-        await this.page.locator(locatorValue).nth(index).click({ force: true });
+        await this.page.locator(locatorValue).nth(index).click();
         if (messageToVerify) {
-            expect(await this.getToastMessage()).toEqual(messageToVerify);
+            let toastMsg = await this.getToastMessage();
+            expect(toastMsg).toEqual(messageToVerify);
             await this.clickCloseIcon();
         }
+        // await utils.waitForSpinnerToDisappear();
         await this.page.waitForTimeout(2000);
     }
 
+    // This function returns the "toast message text"
     async getToastMessage() {
-        return await this.page.locator(this.toastMessage).textContent();
+        return await this.page.locator(this.toastElements.toastMessage).textContent();
     }
 
+    // This function is used to click on the "Close" Icon of the toast message
     async clickCloseIcon() {
-        await this.page.locator(this.closeIcon).click();
+        await (await this.page.waitForSelector(this.toastElements.closeIcon)).waitForElementState("stable");
+        await this.page.locator(this.toastElements.closeIcon).click();
     }
 
+    // This function is used to "click on the element"
     async click(locator: any) {
+        await (await this.page.waitForSelector(locator)).waitForElementState("stable");
         await this.page.locator(locator).click({ force: true });
     }
 
+    // This function is used to "click on the element with index"
     async clickElementWithIndex(locatorValue, index) {
         await this.page.locator(locatorValue).nth(index).click();
     }
 
+    // This function is for "uploading the file" and clicking on Save and verifying cancel button functionality
     async uploadFile(filePath: any, section: string, save: boolean) {
         await this.clickAddButton(section);
-        await this.page.waitForSelector(this.browseButton);
+        await this.page.waitForSelector(this.attachments.browseButton);
         // this.page.on("filechooser", async (filechooser) => {
         //     await filechooser.setFiles('uploadTextFile.txt')
         //   });
-        await this.page.setInputFiles(this.uploadElement, filePath);
+        await this.page.setInputFiles(this.attachments.uploadElement, filePath);
         await this.fillTextBoxValues(this.immigrationDetails.comment, Constants.fillText.comment);
-        await this.page.waitForTimeout(3000);
         if (save) {
+            await (await this.page.waitForSelector(this.save)).waitForElementState("stable");
             await this.page.locator(this.save).last().click();
             expect(await this.getToastMessage()).toEqual(Constants.sucessMsg.sucessfulSavedMsg);
             await this.clickCloseIcon();
         }
         else {
-            await this.click(this.cancel);
-            await this.page.waitForSelector(this.noRecordsText);
+            await this.click(this.attachments.cancel);
+            await this.page.waitForSelector(this.attachments.noRecordsText);
         }
     }
 
+    // This function is used to "delete the existing files" and asserting
     async deleteExistingFiles() {
         if (await this.isDeleteButtonPresent()) {
-            await (await this.page.waitForSelector(this.deleteSelectedButton)).waitForElementState("stable");
-            expect(this.page.locator(this.deleteSelectedButton)).toBeVisible();
-            await this.click(this.deleteSelectedButton);
-            await this.page.waitForSelector(this.confirmationPopup);
-            await this.page.locator(this.popupDeleteButton).click();
+            await (await this.page.waitForSelector(this.attachments.deleteSelectedButton)).waitForElementState("stable");
+            expect(this.page.locator(this.attachments.deleteSelectedButton)).toBeVisible();
+            await this.click(this.attachments.deleteSelectedButton);
+            await this.page.waitForSelector(this.attachments.confirmationPopup);
+            await this.page.locator(this.attachments.popupDeleteButton).click();
             expect(await this.getToastMessage()).toEqual(Constants.sucessMsg.successfulDeletedMsg);
-            await this.page.waitForTimeout(3000);
-            const record = await this.page.locator(this.noRecordsText).textContent();
+            await (await this.page.waitForSelector(this.attachments.noRecordsText)).waitForElementState("stable");
+            const record = await this.page.locator(this.attachments.noRecordsText).textContent();
             expect(record).toContain(Constants.noRecordsText);
         }
     }
 
-    async clickContactDetailsMenu() {
-        await this.page.waitForSelector(this.contactDetails);
-        await this.page.getByRole('link', { name: 'Contact Details' }).click();
-        await this.page.waitForSelector(this.container);
-        await this.page.waitForTimeout(5000);
-    };
-
-    async clickEmergencyContactsMenu() {
-        await this.page.waitForSelector(this.emergencyContactDetails.emergencyContactMenuLink);
-        await this.page.getByRole('link', { name: 'Emergency Contacts' }).click();
-        await this.page.waitForSelector(this.container);
-        await this.page.waitForTimeout(5000);
-    };
-
-    async clickDependentsMenu() {
-        await this.page.waitForSelector(this.dependentsDetails.dependentsMenuLink);
-        await this.page.getByRole('link', { name: 'Dependents' }).click();
-        await this.page.waitForSelector(this.container);
-        await this.page.waitForTimeout(5000);
-    };
-
-    async clickMenu(locator, menuLink) {
+    // This function is used to "click on the My info sub menus"
+    async clickMenu(role, locator, menuLinkText) {
         await this.page.waitForSelector(locator);
-        await this.page.getByRole('link', { name: menuLink }).click();
-        await this.page.waitForSelector(this.container);
-        await this.page.waitForTimeout(5000);
+        await this.page.getByRole(role, { name: menuLinkText }).click();
+        await (await this.page.waitForSelector(this.backgroundContainer)).waitForElementState("stable");
+        await this.page.waitForTimeout(3000);
     }
 
+    // This function is used to delete the existing files and verifying confirmation of "Yes" and "No" button
     async deleteAttachedFile(confirmation: string) {
         if (confirmation == "cancel") {
-            await this.page.locator(this.deleteIcon).first().click();
-            await this.page.waitForSelector(this.confirmationPopup);
-            expect(await this.page.locator(this.popupText).textContent()).toEqual(Constants.popupText.text);
+            await this.page.locator(this.attachments.deleteIcon).first().click();
+            await this.page.waitForSelector(this.attachments.confirmationPopup);
+            expect(await this.page.locator(this.attachments.popupText).textContent()).toEqual(Constants.popupText.text);
             await this.page.getByRole('button', { name: /^\s*No, Cancel\s*$/i }).click();
-            expect(this.page.locator(this.attachemtRow).first()).toBeVisible();
+            expect(this.page.locator(this.attachments.attachemtRow).first()).toBeVisible();
         }
         else {
-            await this.page.locator(this.deleteIcon).first().click();
-            await this.page.waitForSelector(this.confirmationPopup);
-            expect(await this.page.locator(this.popupText).textContent()).toEqual(Constants.popupText.text);
-            await this.page.locator(this.popupDeleteButton).click();
-            expect(this.page.locator(this.attachemtRow).first()).not.toBeVisible();
+            await this.page.locator(this.attachments.deleteIcon).first().click();
+            await this.page.waitForSelector(this.attachments.confirmationPopup);
+            expect(await this.page.locator(this.attachments.popupText).textContent()).toEqual(Constants.popupText.text);
+            await this.page.locator(this.attachments.popupDeleteButton).click();
+            expect(this.page.locator(this.attachments.attachemtRow).first()).not.toBeVisible();
         }
     };
 
-    async fillFieldValues(namesLocators: any, values: any) {
-        for (const locator of namesLocators) {
+    // This function is used to filling the multiple textbox values using "for of" loop
+    async fillFieldValues(locators: any, values: any) {
+        for (const locator of locators) {
             await this.clearTextBoxValues(locator);
-            const index = namesLocators.indexOf(locator);
+            const index = locators.indexOf(locator);
             await this.fillTextBoxValues(locator, values[index]);
-            await this.page.waitForTimeout(3000);
+            await this.page.waitForTimeout(1000);
         };
     }
 
+    // This function is used to "copy and paste" the values from the any textbox elements
     async copyPaste(sourceLocator, destinationLocator) {
         await this.page.locator(sourceLocator).dblclick();
         await this.page.locator(sourceLocator).press('Control+C');

@@ -22,8 +22,8 @@ test.beforeAll(async ({ browser }) => {
     let pass = await testData.encodeDecodePassword();
     await loginPage.fillUsrNameAndPwdAndLogin(ENV.USERNAME, pass);
     await expect(page).toHaveURL(/.*dashboard/);
-    await page.waitForSelector(homePage.dashboardGrid);
-    await homePage.clickMenu(homePage.directory, "link", "Performance");
+    await page.waitForSelector(homePage.homePage.dashboardGrid);
+    await myInfoPage.clickMenu("link", homePage.homePage.directory, "Performance");
 });
 
 test.afterAll(async () => {
@@ -32,73 +32,56 @@ test.afterAll(async () => {
 
 test.describe('Performance', () => {
     test('Filling KPIs details', async () => {
-        await myInfoPage.click(performancePage.configure);
+        await myInfoPage.click(performancePage.keyPerformanceIndicators.configure);
         await performancePage.clickByRole("menuitem", 'KPIs');
         let row = await performancePage.getARowCheckbox('A Playwright Test');
-        await myInfoPage.click(performancePage.add);
-        await myInfoPage.fillTextBoxValues(performancePage.keyPerformanceIndicator, "A Playwright Test");
-        await myInfoPage.selecDropdownOptionWithRole(performancePage.jobTitle, "Software Engineer");
+        await myInfoPage.click(performancePage.keyPerformanceIndicators.add);
+        await myInfoPage.fillTextBoxValues(performancePage.keyPerformanceIndicators.keyPerformanceIndicator, "A Playwright Test");
+        await myInfoPage.selecDropdownOption("option", performancePage.keyPerformanceIndicators.jobTitle, "Software Engineer");
         await myInfoPage.clickSave(myInfoPage.save, 1, Constants.sucessMsg.sucessfulSavedMsg);
-        await myInfoPage.selecDropdownOptionWithRole(performancePage.jobTitle, "Software Engineer");
-        await myInfoPage.click(performancePage.search);
+        await myInfoPage.selecDropdownOption("option", performancePage.keyPerformanceIndicators.jobTitle, "Software Engineer");
+        await myInfoPage.click(performancePage.keyPerformanceIndicators.search);
         await expect(row.nth(0)).toBeVisible();
     });
 
     test('Filling Trackers details', async () => {
-        await myInfoPage.click(performancePage.configure);
+        await myInfoPage.click(performancePage.keyPerformanceIndicators.configure);
         await performancePage.clickByRole("menuitem", 'Trackers');
-        await myInfoPage.click(performancePage.add);
-        await myInfoPage.fillTextBoxValues(performancePage.trackerName, "AB Playwright Test");
-        await myInfoPage.fillTextBoxValues(performancePage.employeeName, "Charlie");
+        await myInfoPage.click(performancePage.keyPerformanceIndicators.add);
+        await myInfoPage.fillTextBoxValues(performancePage.addPerformanceTracker.trackerName, "AB Playwright Test");
+        await myInfoPage.fillTextBoxValues(performancePage.addPerformanceTracker.employeeName, "Charlie");
         await performancePage.clickOption('option', "Charlie Carter");
-        await myInfoPage.fillTextBoxValues(performancePage.reviewers, "Lisa");
+        await myInfoPage.fillTextBoxValues(performancePage.addPerformanceTracker.reviewers, "Lisa");
         await performancePage.clickOption('option', "Lisa Andrews");
         await myInfoPage.clickSave(myInfoPage.save, 1, Constants.sucessMsg.sucessfulSavedMsg);
-        await myInfoPage.fillTextBoxValues(performancePage.employeeName, "Charlie");
+        await myInfoPage.fillTextBoxValues(performancePage.addPerformanceTracker.employeeName, "Charlie");
         await performancePage.clickOption('option', "Charlie Carter");
-        await myInfoPage.click(performancePage.search);
-        await page.waitForTimeout(2000);
+        await myInfoPage.click(performancePage.keyPerformanceIndicators.search);
         let perfTracker = await performancePage.getARow('AB Playwright Test');
         let status = await perfTracker.first().isVisible();
         expect(status).toBeTruthy();
     });
 
-    // test('Viewing My Trackers details', async () => {
-    //     await performancePage.clickByRole(Constants.Roles.link, 'My Trackers');
-    //     let tracker = await performancePage.getARow('Tracker for paul');
-    //     await page.waitForTimeout(3000);
-    //     expect(tracker).toBeVisible();
-    //     let isMyTrackerOpened = await performancePage.clickViewAndVerify();
-    //     expect(isMyTrackerOpened).toBeTruthy();
-    // });
+    test('Viewing My Trackers details', async () => {
+        await performancePage.clickByRole(Constants.Roles.link, 'My Trackers');
+        let tracker = await performancePage.getARow('Tracker for paul');
+        expect(tracker).toBeVisible();
+        let isMyTrackerOpened = await performancePage.clickViewAndVerify();
+        expect(isMyTrackerOpened).toBeTruthy();
+    });
 
     test('Viewing Employee Trackers details', async () => {
         await performancePage.clickByRole(Constants.Roles.link, 'Employee Trackers');
-        await myInfoPage.fillTextBoxValues(performancePage.employeeName, "Charlie");
+        await myInfoPage.fillTextBoxValues(performancePage.addPerformanceTracker.employeeName, "Charlie");
         await performancePage.clickOption('option', "Charlie Carter");
-        await myInfoPage.selecDropdownOptionWithRole(performancePage.include, "Current Employees Only");
-        // let empPerfTracker = await performancePage.getARow('AB Playwright Test');
-        // console.log("empPerfTracker",empPerfTracker);
-        // let empPerfTrackerView = await empPerfTracker.locator("../..//button");
-        let empPerfTracker = page.locator("//div[@class='oxd-table-card']//div[@role='cell']/div[contains(text(),'AB Playwright Test')]/../..//button[@name='view']");
-        await empPerfTracker.nth(0).click();
-        await page.waitForTimeout(6000);
-        await (await page.waitForSelector(performancePage.employeeTrackerView)).waitForElementState("stable");
-        let empPerfTrackerCharlie = await page.locator(performancePage.employeeTrackerView).isVisible();
+        await myInfoPage.selecDropdownOption("option", performancePage.employeeTrackers.include, "Current Employees Only");
+        await performancePage.getViewAndClick('AB Playwright Test',0);
+        let empPerfTrackerCharlie = await performancePage.isEmployeeTrackerViewVisible();
         expect(empPerfTrackerCharlie).toBeTruthy();
-        await myInfoPage.click(performancePage.addLog);
-        await page.waitForSelector(performancePage.logPopup);
-        await myInfoPage.fillTextBoxValues(performancePage.log, "AB pw test");
-        await myInfoPage.clickElementWithIndex(performancePage.positive, 0);
-        await myInfoPage.fillTextBoxValues(performancePage.comment, "Filled Logs");
-        await myInfoPage.clickSave(performancePage.save, 0, Constants.sucessMsg.sucessfulSavedMsg);
-        expect(page.locator(performancePage.employeeTrackerLogContainer)).toBeVisible();
-        await myInfoPage.click(performancePage.verticalDots);
-        await myInfoPage.click(performancePage.delete);
-        await page.waitForSelector(myInfoPage.confirmationPopup);
-        await page.locator(myInfoPage.popupDeleteButton).click();
-        expect(await myInfoPage.getToastMessage()).toEqual(Constants.sucessMsg.successfulDeletedMsg);
-        await page.waitForTimeout(3000);
-        expect(page.locator(performancePage.noRecords)).toBeVisible();
+        await myInfoPage.click(performancePage.logElements.addLog);
+        await performancePage.createLogs();
+        expect(page.locator(performancePage.logElements.employeeTrackerLogContainer)).toBeVisible();
+        await performancePage.deleteLogs();
+        expect(performancePage.page.locator(performancePage.logElements.noRecords)).toBeVisible();
     });
 });

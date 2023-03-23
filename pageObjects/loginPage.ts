@@ -2,41 +2,45 @@ import { Page } from "@playwright/test";
 
 export class LoginPage {
     readonly page: Page;
-    readonly userName: string;
-    readonly password: string;
-    readonly loginButton: string;
-    readonly myInfo: string;
+    readonly loginElements: any;
 
     constructor(page: Page) {
         this.page = page;
-        this.userName = '[name="username"]';
-        this.password = '[name="password"]';
-        this.loginButton = '[type="submit"]';
+        this.loginElements = {
+            userName: '[name="username"]',
+            password: '[name="password"]',
+            loginButton: '[type="submit"]'
+        }
     }
 
+    // This function is used to "launch the application base url"
     async getBaseURL() {
         await this.page.goto('/');
     }
 
+    // This function is used to get the "Username" element
     async getUserNameElement() {
-        await this.page.waitForSelector(this.userName);
-        return this.userName;
+        await this.page.waitForSelector(this.loginElements.userName);
+        return this.loginElements.userName;
     };
 
+    // This function is used to get the "Password" element
     async getPasswordElement() {
-        await this.page.waitForSelector(this.password);
-        return this.password;
+        await this.page.waitForSelector(this.loginElements.password);
+        return this.loginElements.password;
     };
 
+    // This function is used to get the "Password" element
     async fillUsrNameAndPwdAndLogin(userName: string, password: string) {
-        let getUserNameEle = await this.getUserNameElement();
-        await this.page.locator(getUserNameEle).fill(userName);
+        let getUserNameElem = await this.getUserNameElement();
+        await this.page.locator(getUserNameElem).fill(userName);
         await this.page.locator(await this.getPasswordElement()).fill(password);
         await this.clickLogin();
     }
 
+    // This function is used to click on the "Login" button
     async clickLogin() {
-        await this.page.waitForSelector(this.loginButton);
-        await this.page.locator(this.loginButton).click();
+        await this.page.waitForSelector(this.loginElements.loginButton);
+        await this.page.locator(this.loginElements.loginButton).click();
     };
 }

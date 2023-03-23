@@ -2,30 +2,29 @@ import { Page } from "@playwright/test";
 
 export class DirectoryPage {
     readonly page: Page;
-    readonly employeeName: string;
-    readonly jobTitle: string;
-    readonly location: string;
-    readonly search: string;
-    readonly reset: string;
-    readonly recordsCount: string;
-    readonly employeeCardHeader: string;
+    readonly directory: any;
 
     constructor(page: Page) {
         this.page = page;
-        this.employeeName = "//label[text()='Employee Name']/../..//input";
-        this.jobTitle = "//label[text()='Job Title']/../../..//div[@class='oxd-select-text-input']";
-        this.location = "//label[text()='Location']/../../..//div[@class='oxd-select-text-input']";
-        this.search = "[type='submit']";
-        this.reset = "[type='reset']";
-        this.recordsCount = ".orangehrm-horizontal-padding span";
-        this.employeeCardHeader = ".orangehrm-directory-card .orangehrm-directory-card-header";
+        this.directory = {
+            employeeName: "//label[text()='Employee Name']/../..//input",
+            jobTitle: "//label[text()='Job Title']/../../..//div[@class='oxd-select-text-input']",
+            location: "//label[text()='Location']/../../..//div[@class='oxd-select-text-input']",
+            search: "[type='submit']",
+            reset: "[type='reset']",
+            recordsCount: ".orangehrm-horizontal-padding span",
+            employeeCardHeader: ".orangehrm-directory-card .orangehrm-directory-card-header"
+        }
     }
 
+    // This function is used to retrieve the "Records Count"
     async getRecordsCount() {
-        return await this.page.locator(this.recordsCount).textContent();
+        await (await this.page.waitForSelector(this.directory.recordsCount)).waitForElementState("stable");
+        return await this.page.locator(this.directory.recordsCount).textContent();
     }
 
+    // This function is used to retrieve the "Employee Name"
     async getEmployeeName() {
-        return await this.page.locator(this.employeeCardHeader).textContent();
+        return await this.page.locator(this.directory.employeeCardHeader).textContent();
     }
 }
