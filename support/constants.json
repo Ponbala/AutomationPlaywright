@@ -51,7 +51,8 @@
     "sucessMsg": {
         "successfulUpdatedMsg": "Successfully Updated",
         "successfulDeletedMsg": "Successfully Deleted",
-        "sucessfulSavedMsg": "Successfully Saved"
+        "sucessfulSavedMsg": "Successfully Saved",
+        "sucessfulActivatedMsg": "Successfully Activated"
     },
     "fillText": {
         "comment": "Text file has been uploaded"

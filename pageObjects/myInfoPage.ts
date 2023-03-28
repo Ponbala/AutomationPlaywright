@@ -168,72 +168,25 @@ export class MyInfoPage {
         await (await this.page.waitForSelector(this.container)).waitForElementState("stable");
     }
 
-    // This function is used to "clear" the "textbox" values
-    async clearTextBoxValues(locatorValue: any) {
-        await (await this.page.waitForSelector(locatorValue)).waitForElementState('editable');
-        await this.page.locator(locatorValue).fill('');
-    };
-
     // This function is used to verify the presence of "Delete" button and return the boolean value
     async isDeleteButtonPresent() {
         return await this.page.locator(this.attachments.deleteSelectedButton).isVisible();
     }
 
-    // This function is used to fill the "textbox" values
-    async fillTextBoxValues(locatorValue: any, fillValue: any) {
-        await (await this.page.waitForSelector(locatorValue)).waitForElementState("editable");
-        await this.page.locator(locatorValue).type(fillValue);
-    };
-
-    // This function is used to fill the "Date" textbox values
-    async fillDateValue(locatorValue: any, fillValue: any) {
-        await this.page.locator(locatorValue).fill(fillValue);
-    };
-
-    // This function is used to click the dropdown and "select the passed value"
-    async selecDropdownOption(role: any, locator: any, optionValue: any) {
-        await this.click(locator);
-        await this.page.getByRole(role, { name: optionValue }).getByText(optionValue, { exact: true }).click();
-    };
-
-    // This function is used to click the dropdown and select the passed value for "listbox" type element
-    async selecDropdownOptionWithRole(locator: any, optionValue: any) {
-        await this.click(locator);
-        await this.page.getByRole('listbox', { name: optionValue }).click();
-    };
-
-    // This function is used to click on the "Save" button
-    async clickSave(locatorValue: string, index: number, messageToVerify?: string) {
-        await this.page.locator(locatorValue).nth(index).click();
-        if (messageToVerify) {
-            let toastMsg = await this.getToastMessage();
-            expect(toastMsg).toEqual(messageToVerify);
-            await this.clickCloseIcon();
+    // This function is used to "delete the existing files" and asserting
+    async deleteExistingFiles() {
+        let deleteButton = await this.isDeleteButtonPresent();
+        if (deleteButton) {
+            await (await this.page.waitForSelector(this.attachments.deleteSelectedButton)).waitForElementState("stable");
+            expect(this.page.locator(this.attachments.deleteSelectedButton)).toBeVisible();
+            await utils.click(this.attachments.deleteSelectedButton);
+            await this.page.waitForSelector(this.attachments.confirmationPopup);
+            await this.page.locator(this.attachments.popupDeleteButton).click();
+            expect(await utils.getToastMessage()).toEqual(Constants.sucessMsg.successfulDeletedMsg);
+            await (await this.page.waitForSelector(this.attachments.noRecordsText)).waitForElementState("stable");
+            const record = await this.page.locator(this.attachments.noRecordsText).textContent();
+            expect(record).toContain(Constants.noRecordsText);
         }
-        // await utils.waitForSpinnerToDisappear();
-        await this.page.waitForTimeout(2000);
-    }
-
-    // This function returns the "toast message text"
-    async getToastMessage() {
-        return await this.page.locator(this.toastElements.toastMessage).textContent();
-    }
-
-    // This function is used to click on the "Close" Icon of the toast message
-    async clickCloseIcon() {
-        await (await this.page.waitForSelector(this.toastElements.closeIcon)).waitForElementState("stable");
-        await this.page.locator(this.toastElements.closeIcon).click();
-    }
-
-    // This function is used to "click on the element"
-    async click(locator: any) {
-        await (await this.page.waitForSelector(locator)).waitForElementState("stable");
-        await this.page.locator(locator).click({ force: true });
-    }
-
-    // This function is used to "click on the element with index"
-    async clickElementWithIndex(locatorValue, index) {
-        await this.page.locator(locatorValue).nth(index).click();
     }
 
     // This function is for "uploading the file" and clicking on Save and verifying cancel button functionality
@@ -244,40 +197,17 @@ export class MyInfoPage {
         //     await filechooser.setFiles('uploadTextFile.txt')
         //   });
         await this.page.setInputFiles(this.attachments.uploadElement, filePath);
-        await this.fillTextBoxValues(this.immigrationDetails.comment, Constants.fillText.comment);
+        await utils.fillTextBoxValues(this.immigrationDetails.comment, Constants.fillText.comment);
         if (save) {
             await (await this.page.waitForSelector(this.save)).waitForElementState("stable");
             await this.page.locator(this.save).last().click();
-            expect(await this.getToastMessage()).toEqual(Constants.sucessMsg.sucessfulSavedMsg);
-            await this.clickCloseIcon();
+            expect(await utils.getToastMessage()).toEqual(Constants.sucessMsg.sucessfulSavedMsg);
+            await utils.clickCloseIcon();
         }
         else {
-            await this.click(this.attachments.cancel);
+            await utils.click(this.attachments.cancel);
             await this.page.waitForSelector(this.attachments.noRecordsText);
         }
-    }
-
-    // This function is used to "delete the existing files" and asserting
-    async deleteExistingFiles() {
-        if (await this.isDeleteButtonPresent()) {
-            await (await this.page.waitForSelector(this.attachments.deleteSelectedButton)).waitForElementState("stable");
-            expect(this.page.locator(this.attachments.deleteSelectedButton)).toBeVisible();
-            await this.click(this.attachments.deleteSelectedButton);
-            await this.page.waitForSelector(this.attachments.confirmationPopup);
-            await this.page.locator(this.attachments.popupDeleteButton).click();
-            expect(await this.getToastMessage()).toEqual(Constants.sucessMsg.successfulDeletedMsg);
-            await (await this.page.waitForSelector(this.attachments.noRecordsText)).waitForElementState("stable");
-            const record = await this.page.locator(this.attachments.noRecordsText).textContent();
-            expect(record).toContain(Constants.noRecordsText);
-        }
-    }
-
-    // This function is used to "click on the My info sub menus"
-    async clickMenu(role, locator, menuLinkText) {
-        await this.page.waitForSelector(locator);
-        await this.page.getByRole(role, { name: menuLinkText }).click();
-        await (await this.page.waitForSelector(this.backgroundContainer)).waitForElementState("stable");
-        await this.page.waitForTimeout(3000);
     }
 
     // This function is used to delete the existing files and verifying confirmation of "Yes" and "No" button
@@ -297,21 +227,4 @@ export class MyInfoPage {
             expect(this.page.locator(this.attachments.attachemtRow).first()).not.toBeVisible();
         }
     };
-
-    // This function is used to filling the multiple textbox values using "for of" loop
-    async fillFieldValues(locators: any, values: any) {
-        for (const locator of locators) {
-            await this.clearTextBoxValues(locator);
-            const index = locators.indexOf(locator);
-            await this.fillTextBoxValues(locator, values[index]);
-            await this.page.waitForTimeout(1000);
-        };
-    }
-
-    // This function is used to "copy and paste" the values from the any textbox elements
-    async copyPaste(sourceLocator, destinationLocator) {
-        await this.page.locator(sourceLocator).dblclick();
-        await this.page.locator(sourceLocator).press('Control+C');
-        await this.page.locator(destinationLocator).press('Control+V');
-    }
 }

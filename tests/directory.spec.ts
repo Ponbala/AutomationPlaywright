@@ -1,10 +1,10 @@
 import { test, expect, Page } from '@playwright/test';
 import { Utils } from '../support/utils';
 import { TestData } from '../testData/testData';
-import { LoginPage, HomePage, MyInfoPage, DirectoryPage } from '../pageObjects';
+import { LoginPage, HomePage, DirectoryPage } from '../pageObjects';
 import ENV from '../support/env';
 
-let loginPage: LoginPage, homePage: HomePage, myInfoPage: MyInfoPage, directoryPage: DirectoryPage, testData: TestData, page: Page, utils: Utils;
+let loginPage: LoginPage, homePage: HomePage, directoryPage: DirectoryPage, testData: TestData, page: Page, utils: Utils;
 
 test.beforeAll(async ({ browser }) => {
     page = await browser.newPage();
@@ -12,7 +12,6 @@ test.beforeAll(async ({ browser }) => {
     // await utils.launchBrowsers();
     loginPage = new LoginPage(page);
     homePage = new HomePage(page);
-    myInfoPage = new MyInfoPage(page);
     directoryPage = new DirectoryPage(page);
     testData = new TestData(page);
     await loginPage.getBaseURL();
@@ -20,8 +19,7 @@ test.beforeAll(async ({ browser }) => {
     let pass = await testData.encodeDecodePassword();
     await loginPage.fillUsrNameAndPwdAndLogin(ENV.USERNAME, pass);
     await expect(page).toHaveURL(/.*dashboard/);
-    await page.waitForSelector(homePage.homePage.dashboardGrid);
-    await myInfoPage.clickMenu("link", homePage.homePage.directory, "Directory");
+    await page.waitForSelector(homePage.homePageElements.dashboardGrid);
 });
 
 test.afterAll(async () => {
@@ -30,13 +28,14 @@ test.afterAll(async () => {
 
 test.describe('Directory', () => {
     test('Filling Directory details', async () => {
-        await myInfoPage.fillTextBoxValues(directoryPage.directory.employeeName, "Charlie");
-        await page.getByRole('option', { name: "Charlie Carter" }).getByText("Charlie Carter", { exact: true }).click();
-        await myInfoPage.selecDropdownOption("option", directoryPage.directory.jobTitle, "QA Engineer");
-        await myInfoPage.selecDropdownOption("option", directoryPage.directory.location, "New York Sales Office");
-        await myInfoPage.click(directoryPage.directory.search);
+        await utils.clickMenu("link", homePage.homePageElements.directory, "Directory");
+        await utils.fillTextBoxValues(directoryPage.directory.employeeName, "Lisa");
+        await page.getByRole('option', { name: "Lisa Andrews" }).getByText("Lisa Andrews", { exact: true }).click();
+        await utils.selecDropdownOption("option", directoryPage.directory.jobTitle, "Software Engineer");
+        await utils.selecDropdownOption("option", directoryPage.directory.location, "Canadian Regional HQ");
+        await utils.click(directoryPage.directory.search);
         await utils.waitForSpinnerToDisappear();
         expect(await (await directoryPage.getRecordsCount()).trim()).toEqual('(1) Record Found');
-        expect(await (await directoryPage.getEmployeeName()).trim()).toEqual('Charlie  Carter');
+        expect(await (await directoryPage.getEmployeeName()).trim()).toEqual('Lisa  Andrews');
     });
 });
