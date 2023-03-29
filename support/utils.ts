@@ -134,10 +134,17 @@ export class Utils {
     return await this.page.locator(locator).textContent();
   }
 
+  //This function is used to check the element is visible or not
+  async isElementVisible(locator: string) {
+    return await this.page.locator(locator).isVisible();
+  }
+
   // This function is used to "click the element/link"
-  async clickByRole(role, value) {
+  async clickByRole(role, value, shouldWaitForContainer?: boolean) {
     await this.page.getByRole(role, { name: value, exact: true }).click();
-    await this.page.waitForSelector(this.backgroundContainer);
+    if (shouldWaitForContainer) {
+      await this.page.waitForSelector(this.backgroundContainer);
+    }
   }
 
   // This function is used to "select the option" from "Auto suggestion"
@@ -162,8 +169,10 @@ export class Utils {
     await this.click("//a[text()='Employee List']");
     await this.fillTextBoxValues(directoryPage.directory.employeeName, "Test User");
     await this.click(directoryPage.directory.search);
+    await this.waitForSpinnerToDisappear();
+    await (await this.page.waitForSelector(".orangehrm-paper-container")).waitForElementState("stable");
     await this.page.waitForTimeout(5000);
-    let tableRow = await this.page.locator("//div[@class='oxd-table-card']//div[@role='cell']/div[contains(text(),'Software Engineer')]").first().isVisible();
+    let tableRow = await this.page.locator("//div[@class='oxd-table-card']//div[@role='cell']/div[contains(text(),'Test')]").first().isVisible();
     console.log("tableRow", tableRow);
     if (tableRow) {
       await this.deleteRecords("Software Engineer");
@@ -172,11 +181,10 @@ export class Utils {
 
   async deleteRecords(value) {
     // await (await this.page.waitForSelector(this.addReview.tableRow)).waitForElementState("stable");
-    let row = this.page.locator(this.tableRow).first();
-    let rowVisibility = await row.isVisible();
+    let rowVisibility = await this.page.locator(this.tableRow).first().isVisible();
     console.log("rowVisibility", rowVisibility);
     if (rowVisibility) {
-      let rows = this.page.locator("//div[@class='oxd-table-card']//div[@role='cell']/div[contains(text(),'User')]");
+      let rows = this.page.locator("//div[@class='oxd-table-card']//div[@role='cell']/div[contains(text(),'Software Engineer')]");
       console.log("rows", await rows.count());
       let rowsCount = await rows.count();
       for (let i = 0; i < rowsCount; i++) {
@@ -216,6 +224,7 @@ export class Utils {
     await this.page.waitForTimeout(4000);
     await this.fillDateValue("//label[text()='Joined Date']/../..//input", "2023-03-10");
     await this.selecDropdownOption("option", "//label[text()='Job Title']/../..//div[@class='oxd-select-text-input']", "Software Engineer");
+    await this.selecDropdownOption("option", "//label[text()='Location']/../..//div[@class='oxd-select-text-input']", "Texas R&D");
     await this.clickSave(this.save, 0);
   }
 

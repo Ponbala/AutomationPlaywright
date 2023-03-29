@@ -24,7 +24,7 @@ const RPconfig = {
 
 export default defineConfig({
   testDir: './tests',
-  testMatch: ["tests/time.spec.ts"],
+  testMatch: ["tests/myInfo.spec.ts"],
   timeout: 60 * 60 * 1000,
   expect: {
     timeout: 10000
@@ -41,7 +41,7 @@ export default defineConfig({
     baseURL: 'https://opensource-demo.orangehrmlive.com',
     headless: false,
     trace: 'on',
-    // video: "on",
+    video: "on",
     screenshot: "on"
   },
 

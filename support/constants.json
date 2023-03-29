@@ -52,7 +52,12 @@
         "successfulUpdatedMsg": "Successfully Updated",
         "successfulDeletedMsg": "Successfully Deleted",
         "sucessfulSavedMsg": "Successfully Saved",
-        "sucessfulActivatedMsg": "Successfully Activated"
+        "sucessfulActivatedMsg": "Successfully Activated",
+        "sucessfulSubmittedMsg": "Timesheet Submitted"
+    },
+    "others":{
+        "minimizeIconClass": "bi-fullscreen-exit",
+        "maximizeIconClass": "bi-arrows-fullscreen"
     },
     "fillText": {
         "comment": "Text file has been uploaded"

@@ -71,7 +71,7 @@ test.describe('Performance Configure', () => {
         await utils.clickMenu("link", homePage.homePageElements.performance, "Performance");
 
         await utils.click(performancePage.keyPerformanceIndicators.configure);
-        await utils.clickByRole("menuitem", 'KPIs');
+        await utils.clickByRole("menuitem", 'KPIs',true);
         let row = await performancePage.getARowCheckbox('A Playwright Test');
         await utils.click(performancePage.add);
         await utils.fillTextBoxValues(performancePage.keyPerformanceIndicators.keyPerformanceIndicator, "A Playwright Test");
@@ -85,7 +85,7 @@ test.describe('Performance Configure', () => {
 
 test('Filling Trackers details', async () => {
     await utils.click(performancePage.keyPerformanceIndicators.configure);
-    await utils.clickByRole("menuitem", 'Trackers');
+    await utils.clickByRole("menuitem", 'Trackers',true);
     await utils.click(performancePage.add);
     await utils.fillTextBoxValues(performancePage.addPerformanceTracker.trackerName, "AB Playwright Test");
     await utils.fillTextBoxValues(performancePage.addPerformanceTracker.employeeName, "Test U");
@@ -103,7 +103,7 @@ test('Filling Trackers details', async () => {
 
 test.describe('Performance My tracker', () => {
     test('Viewing My Trackers details', async () => {
-        await utils.clickByRole(Constants.Roles.link, 'My Trackers');
+        await utils.clickByRole(Constants.Roles.link, 'My Trackers',true);
         let tracker = await performancePage.getARow('AB Playwright Test');
         expect(tracker).toBeVisible();
         let isMyTrackerOpened = await performancePage.clickViewAndVerify();
@@ -113,7 +113,7 @@ test.describe('Performance My tracker', () => {
 
 test.describe('Performance Employee Tracker', () => {
     test('Viewing Employee Trackers details', async () => {
-        await utils.clickByRole(Constants.Roles.link, 'Employee Trackers');
+        await utils.clickByRole(Constants.Roles.link, 'Employee Trackers'),true;
         await utils.fillTextBoxValues(performancePage.addPerformanceTracker.employeeName, "Test  U");
         await utils.clickOption('option', "Test  User2");
         await utils.selecDropdownOption("option", performancePage.employeeTrackers.include, "Current Employees Only");
@@ -132,7 +132,7 @@ test.describe('Performance Manage Reviews', () => {
     test('Deleting the existing Performance Reviews records', async () => {
         // await myInfoPage.clickMenu("link", homePage.homePage.performance, "Performance");
         await utils.click(performancePage.manageReviews.manageReviewsMenu);
-        await utils.clickByRole("menuitem", 'Manage Reviews');
+        await utils.clickByRole("menuitem", 'Manage Reviews',true);
         // await performancePage.deleteRecords("2023");
         expect(page.locator(performancePage.addReview.tableRow)).not.toBeVisible();
     });
@@ -170,7 +170,7 @@ test.describe('Performance Manage Reviews', () => {
 test.describe('Performance My Reviews', () => {
     test('Viewing the My Reviews performance', async () => {
         await utils.click(performancePage.manageReviews.manageReviewsMenu);
-        await utils.clickByRole("menuitem", 'My Reviews');
+        await utils.clickByRole("menuitem", 'My Reviews',true);
         await page.waitForTimeout(5000);
         let dueDate = await page.locator("//div[text()='2023-03-30']").isVisible();
         console.log("dueDate", dueDate);
@@ -186,7 +186,7 @@ test.describe('Performance My Reviews', () => {
         await utils.clickElementWithIndex(performancePage.myReview.popupButtons, 2);
         expect(await utils.getToastMessage()).toEqual(Constants.sucessMsg.sucessfulSavedMsg);
         await utils.click(performancePage.manageReviews.manageReviewsMenu);
-        await utils.clickByRole("menuitem", 'My Reviews');
+        await utils.clickByRole("menuitem", 'My Reviews',true);
         await page.waitForTimeout(5000);
         let rowCells = await performancePage.getMyReviewDetails('2023-03-30');
         console.log("rowcells3", rowCells);
@@ -203,7 +203,7 @@ test.describe('Performance Employee Reviews', () => {
         await page.waitForSelector(homePage.homePageElements.dashboardGrid);
         await utils.clickMenu("link", homePage.homePageElements.performance, "Performance");
         await utils.click(performancePage.manageReviews.manageReviewsMenu);
-        await utils.clickByRole("menuitem", 'Employee Reviews');
+        await utils.clickByRole("menuitem", 'Employee Reviews',true);
         await page.waitForTimeout(3000);
         await utils.fillTextBoxValues(performancePage.addReview.employeeName, "Test U")
         await utils.clickOption('option', "Test User1");

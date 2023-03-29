@@ -20,6 +20,13 @@ test.beforeAll(async ({ browser }) => {
     await loginPage.fillUsrNameAndPwdAndLogin(ENV.USERNAME, pass);
     await expect(page).toHaveURL(/.*dashboard/);
     await page.waitForSelector(homePage.homePageElements.dashboardGrid);
+    await utils.deleteUsers();
+    await utils.createUsers("Test", "User1", "testuser1");
+    await utils.updatingUserRole("testuser1", "Admin");
+    await utils.logout();
+    await loginPage.fillUsrNameAndPwdAndLogin("testuser1", "Testuser@12");
+    await expect(page).toHaveURL(/.*dashboard/);
+    await page.waitForSelector(homePage.homePageElements.dashboardGrid);
 });
 
 test.afterAll(async () => {
@@ -29,13 +36,13 @@ test.afterAll(async () => {
 test.describe('Directory', () => {
     test('Filling Directory details', async () => {
         await utils.clickMenu("link", homePage.homePageElements.directory, "Directory");
-        await utils.fillTextBoxValues(directoryPage.directory.employeeName, "Lisa");
-        await page.getByRole('option', { name: "Lisa Andrews" }).getByText("Lisa Andrews", { exact: true }).click();
+        await utils.fillTextBoxValues(directoryPage.directory.employeeName, "Test");
+        await utils.clickOption("option","Test User1");
         await utils.selecDropdownOption("option", directoryPage.directory.jobTitle, "Software Engineer");
-        await utils.selecDropdownOption("option", directoryPage.directory.location, "Canadian Regional HQ");
+        await utils.selecDropdownOption("option", directoryPage.directory.location, "Texas R&D");
         await utils.click(directoryPage.directory.search);
         await utils.waitForSpinnerToDisappear();
         expect(await (await directoryPage.getRecordsCount()).trim()).toEqual('(1) Record Found');
-        expect(await (await directoryPage.getEmployeeName()).trim()).toEqual('Lisa  Andrews');
+        expect(await (await directoryPage.getEmployeeName()).trim()).toEqual('Test  User1');
     });
 });
