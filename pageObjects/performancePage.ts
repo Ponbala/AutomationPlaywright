@@ -18,21 +18,25 @@ export class PerformancePage {
     readonly addReview: any;
     readonly myReview: any;
     readonly attachments: any;
+    readonly view: string;
+    readonly rowForCheckbox: (value: any) => string;
+    readonly row: (value: any) => string;
+    readonly getRowCells: (columnValue: any) => string;
 
     constructor(page: Page) {
         this.page = page;
         utils = new Utils(page);
-        this.save = "button[type='submit']";
-        this.add = "//button[text()=' Add ']";
-        this.cancel = "//button[text()=' Cancel ']";
+        this.save = "//button[normalize-space()='Save']";
+        this.add = "//button[normalize-space()='Add']";
+        this.cancel = "//button[normalize-space()='Cancel']";
         this.keyPerformanceIndicators = {
-            search: "(//div[@class='oxd-form-actions']//button)[2]",
+            search: "//button[normalize-space()='Search']",
             comment: "//p[.='Add Tracker Log']/../..//textarea",
             backgroundContainer: '.orangehrm-background-container',
             logPopup: '.oxd-dialog-sheet',
             configure: "//span[contains(text(),'Configure')]",
             keyPerformanceIndicator: "//label[text()='Key Performance Indicator']/../..//input",
-            jobTitle: "//label[text()='Job Title']/../../..//div[@class='oxd-select-text-input']"
+            jobTitle: "//label[text()='Job Title']/../../..//div[contains(@class,'text-input')]"
         }
         this.addPerformanceTracker = {
             trackerName: "//label[text()='Tracker Name']/../..//input",
@@ -45,7 +49,7 @@ export class PerformancePage {
         }
         this.employeeTrackers = {
             employeeTrackerView: "//h5[text()='AB Playwright Test']",
-            include: "//label[text()='Include']/../..//div[@class='oxd-select-text-input']"
+            include: "//label[text()='Include']/../..//div[contains(@class,'text-input')]"
         }
         this.logElements = {
             addLog: "//button[text()= ' Add Log ']",
@@ -63,7 +67,11 @@ export class PerformancePage {
             complete: '.orangehrm-performance-review-actions button',
             confirmationReviewPopup: '.oxd-dialog-sheet',
             popupButtons: '.oxd-dialog-sheet button',
-            dueDate: "//div[text()='2023-03-30']"
+            dueDate: "//div[text()='2023-03-30']",
+            fileIcon: ".bi-file-text-fill",
+            ratingField: ".orangehrm-evaluation-grid .oxd-input--active",
+            commentsField: ".orangehrm-evaluation-grid .oxd-textarea--active",
+            generalComments: "//p[text()='General Comment']/../..//following::textarea",
         }
         this.addReview = {
             employeeName: "//label[text()='Employee Name']/../..//input",
@@ -90,19 +98,29 @@ export class PerformancePage {
             popupText: 'p.oxd-text--card-body',
             attachemtRow: 'div.oxd-table-card',
             table: '.oxd-table-body',
-            popupDeleteButton: '(//div[@class="orangehrm-modal-footer"]//button)[2]'
+            popupDeleteButton: "//button[normalize-space()='Yes, Delete']"
+        }
+        this.view = "../..//button";
+        this.rowForCheckbox = (value) => {
+            return `//div[text()='${value}']/../..//input[@type='checkbox']`;
+        }
+        this.row = (value) => {
+            return `//div[@class='oxd-table-card']//div[@role='cell']/div[contains(text(),'${value}')]`;
+        }
+        this.getRowCells = (columnValue: any) => {
+            return `//div[@class='oxd-table-card']//div[@role='cell']/div[text()='${columnValue}']/../..//div[@role='cell']/div`;
         }
     }
 
     // This function is used to get the "specific row checkbox"
     async getARowCheckbox(value) {
-        return this.page.locator(`//div[text()='${value}']/../..//input[@type='checkbox']`);
+        return this.page.locator(this.rowForCheckbox(value));
     }
 
     // This function is used to get the "specific row"
     async getARow(value) {
-        await this.page.waitForSelector(`//div[@class='oxd-table-card']//div[@role='cell']/div[contains(text(),'${value}')]`);
-        return this.page.locator(`//div[@class='oxd-table-card']//div[@role='cell']/div[contains(text(),'${value}')]`);
+        await this.page.waitForSelector(this.row(value));
+        return this.page.locator(this.row(value));
     }
 
     // This function is used to click on "View" and return the tracker visibility status
@@ -117,9 +135,9 @@ export class PerformancePage {
     // This function is used to click on "View" of the specific row
     async getViewAndClick(cellText, index) {
         let empPerfTracker = await this.getARow(cellText);
-        let empPerfTrackerView = empPerfTracker.locator("../..//button");
+        let empPerfTrackerView = empPerfTracker.locator(this.view);
         await empPerfTrackerView.nth(index).click();
-        await (await this.page.waitForSelector(this.employeeTrackers.employeeTrackerView)).waitForElementState("stable");
+        await utils.waitForElement(this.employeeTrackers.employeeTrackerView);
     }
 
     // This function is used to get "Employee Tracker" View visible status
@@ -130,9 +148,9 @@ export class PerformancePage {
     //This function is used to "Create Logs" in Employee Tracker page
     async createLogs() {
         await this.page.waitForSelector(this.keyPerformanceIndicators.logPopup);
-        await utils.fillTextBoxValues(this.logElements.log, "AB pw test");
+        await utils.fillTextBoxValues(this.logElements.log, "AB pw test", true);
         await utils.clickElementWithIndex(this.logElements.positive, 0);
-        await utils.fillTextBoxValues(this.keyPerformanceIndicators.comment, "Filled Logs");
+        await utils.fillTextBoxValues(this.keyPerformanceIndicators.comment, "Filled Logs", true);
         await utils.clickSave(this.save, 0, Constants.sucessMsg.sucessfulSavedMsg);
         await this.page.waitForSelector(this.logElements.employeeTrackerLogContainer);
     }
@@ -148,6 +166,7 @@ export class PerformancePage {
         await this.page.waitForSelector(this.logElements.noRecords);
     }
 
+    //This function is used to get a Add review Row Details
     async getRowDetails() {
         // let sd = await this.getARow();
         await this.page.waitForSelector(this.addReview.tableRow);
@@ -163,12 +182,11 @@ export class PerformancePage {
         }
     }
 
-   
-
+    //This function is used to get a My Review Row Details
     async getMyReviewDetails(columnValue) {
         // let row = await this.getARow(columnValue);
         await this.page.waitForSelector(this.addReview.tableRow);
-        let rowCellValues = await this.page.locator(`//div[@class='oxd-table-card']//div[@role='cell']/div[text()='${columnValue}']/../..//div[@role='cell']/div`).allTextContents();
+        let rowCellValues = await this.page.locator(this.getRowCells(columnValue)).allTextContents();
         console.log("rowCellValues", rowCellValues);
         return {
             jobTitle: rowCellValues[0],
@@ -178,5 +196,23 @@ export class PerformancePage {
             selfEvaluationStatus: rowCellValues[4],
             reviewStatus: rowCellValues[5]
         }
+    }
+
+    //This function is used to get a fill the My Review Details
+    async fillMyReviewDetails() {
+        let dueDate = await utils.isElementVisible(this.myReview.dueDate);
+        console.log("dueDate", dueDate);
+        expect(dueDate).toBeTruthy();
+        await utils.clickElementWithIndex(this.myReview.fileIcon, 0);
+        for (let i = 0; i < 5; i++) {
+            console.log("iteration", i);
+            await this.page.locator(this.myReview.ratingField).nth(i).fill('90');
+            await this.page.locator(this.myReview.commentsField).nth(i).fill('Good Performance');
+        }
+        await this.page.locator(this.myReview.generalComments).type("Overall good");
+        await utils.clickElementWithIndex(this.myReview.complete, 2);
+        await utils.clickElementWithIndex(this.myReview.popupButtons, 2);
+        expect(await utils.getToastMessage()).toEqual(Constants.sucessMsg.sucessfulSavedMsg);
+        await utils.click(this.manageReviews.manageReviewsMenu);
     }
 }

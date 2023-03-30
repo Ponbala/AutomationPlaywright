@@ -15,13 +15,33 @@ export class Utils {
   readonly tableRow: string;
   readonly attachments: any;
   readonly editIcon: string;
+  readonly spinner: string;
+  readonly userDropdown: string;
+  readonly tableContainer: string;
+  readonly employeeListMenu: string;
+  readonly trashPath: string;
+  readonly addEmployee: string;
+  readonly row: (value: any) => string;
+  readonly firstName: string;
+  readonly lastName: string;
+  readonly switch: string;
+  readonly userName: string;
+  readonly password: string;
+  readonly confirmPassword: string;
+  readonly job: string;
+  readonly joinedDate: string;
+  readonly jobTitle: string;
+  readonly location: string;
+  readonly search: string;
+  readonly userRole: string;
 
   constructor(page: Page) {
     this.page = page;
     homePage = new HomePage(page);
     directoryPage = new DirectoryPage(page);
     this.backgroundContainer = '.orangehrm-background-container';
-    this.save = 'button.oxd-button--medium';
+    this.save = "//button[normalize-space()='Save']";
+    this.search = "//button[normalize-space()='Search']";
     this.toastElements = {
       toastMessage: 'p.oxd-text--toast-message',
       closeIcon: '.oxd-toast-close-container'
@@ -34,6 +54,26 @@ export class Utils {
     }
     this.tableRow = "//div[@class='oxd-table-card']/div[@role='row']";
     this.editIcon = ".oxd-icon.bi-pencil-fill";
+    this.spinner = ".oxd-loading-spinner";
+    this.userDropdown = ".oxd-userdropdown-tab";
+    this.tableContainer = ".orangehrm-paper-container";
+    this.employeeListMenu = "//a[text()='Employee List']";
+    this.trashPath = "../..//i[@class='oxd-icon bi-trash']";
+    this.addEmployee = "//a[text()='Add Employee']";
+    this.firstName = "[name='firstName']";
+    this.lastName = "[name='lastName']";
+    this.switch = ".oxd-switch-wrapper input";
+    this.userName = "//label[text()='Username']/../..//input";
+    this.password = "//label[text()='Password']/../..//input";
+    this.confirmPassword = "//label[text()='Confirm Password']/../..//input";
+    this.job = "//a[text()='Job']";
+    this.joinedDate = "//label[text()='Joined Date']/../..//input";
+    this.jobTitle = "//label[text()='Job Title']/../..//div[contains(@class,'text-input')]";
+    this.location = "//label[text()='Location']/../..//div[contains(@class,'text-input')]";
+    this.userRole = "//label[text()='User Role']/../..//div[contains(@class,'text-input')]";
+    this.row = (value) => {
+      return `//div[@class='oxd-table-card']//div[@role='cell']/div[contains(text(),'${value}')]`;
+    }
   }
 
   async launchBrowsers() {
@@ -44,26 +84,36 @@ export class Utils {
     ]);
   }
 
+  // This function is used to wait for the spinner to appear and disappear
   async waitForSpinnerToDisappear() {
-    const spinner = await this.page.waitForSelector('.oxd-loading-spinner');
+    const spinner = await this.page.waitForSelector(this.spinner);
     await spinner.waitForElementState("hidden");
   }
 
+  // This function is used to wait for the logout
   async logout() {
-    await this.click(".oxd-userdropdown-tab");
+    await this.click(this.userDropdown);
     await this.page.getByRole("menuitem", { name: "Logout", exact: true }).click();
+  }
+
+  // This function is used to get the element
+  async getElement(locator) {
+    return this.page.locator(locator);
   }
 
   // This function is used to "clear" the "textbox" values
   async clearTextBoxValues(locatorValue: any) {
     await (await this.page.waitForSelector(locatorValue)).waitForElementState('editable');
-    await this.page.locator(locatorValue).fill('');
+    await this.page.locator(locatorValue).clear();
   };
 
 
   // This function is used to fill the "textbox" values
-  async fillTextBoxValues(locatorValue: any, fillValue: any) {
+  async fillTextBoxValues(locatorValue: any, fillValue: any, clearTextbox?: boolean) {
     await (await this.page.waitForSelector(locatorValue)).waitForElementState("editable");
+    if (clearTextbox) {
+      await this.clearTextBoxValues(locatorValue);
+    }
     await this.page.locator(locatorValue).type(fillValue);
   };
 
@@ -104,9 +154,8 @@ export class Utils {
   // This function is used to filling the multiple textbox values using "for of" loop
   async fillFieldValues(locators: any, values: any) {
     for (const locator of locators) {
-      await this.clearTextBoxValues(locator);
       const index = locators.indexOf(locator);
-      await this.fillTextBoxValues(locator, values[index]);
+      await this.fillTextBoxValues(locator, values[index], true);
       await this.page.waitForTimeout(1000);
     };
   }
@@ -145,6 +194,7 @@ export class Utils {
     if (shouldWaitForContainer) {
       await this.page.waitForSelector(this.backgroundContainer);
     }
+    await this.page.waitForLoadState("networkidle", { timeout: 10000 });
   }
 
   // This function is used to "select the option" from "Auto suggestion"
@@ -157,25 +207,25 @@ export class Utils {
     await this.page.waitForSelector(locator);
     await this.page.getByRole(role, { name: menuLinkText }).click();
     await (await this.page.waitForSelector(this.backgroundContainer)).waitForElementState("stable");
+    await this.page.waitForLoadState("networkidle", { timeout: 10000 });
     // await this.page.waitForTimeout(3000);
   }
 
-  async waitForContainer() {
-    await this.page.waitForSelector(this.backgroundContainer);
+  async waitForElement(locator) {
+    await (await this.page.waitForSelector(locator)).waitForElementState("stable");
   }
 
   async deleteUsers() {
     await this.clickMenu("link", homePage.homePageElements.pim, "PIM");
-    await this.click("//a[text()='Employee List']");
-    await this.fillTextBoxValues(directoryPage.directory.employeeName, "Test User");
+    await this.click(this.employeeListMenu);
+    await this.fillTextBoxValues(directoryPage.directory.employeeName, "Test User", true);
     await this.click(directoryPage.directory.search);
-    await this.waitForSpinnerToDisappear();
-    await (await this.page.waitForSelector(".orangehrm-paper-container")).waitForElementState("stable");
+    await this.waitForElement(this.tableContainer);
     await this.page.waitForTimeout(5000);
-    let tableRow = await this.page.locator("//div[@class='oxd-table-card']//div[@role='cell']/div[contains(text(),'Test')]").first().isVisible();
+    let tableRow = await (await this.getARow('Test')).first().isVisible();
     console.log("tableRow", tableRow);
     if (tableRow) {
-      await this.deleteRecords("Software Engineer");
+      await this.deleteRecords("User1");
     }
   }
 
@@ -184,14 +234,14 @@ export class Utils {
     let rowVisibility = await this.page.locator(this.tableRow).first().isVisible();
     console.log("rowVisibility", rowVisibility);
     if (rowVisibility) {
-      let rows = this.page.locator("//div[@class='oxd-table-card']//div[@role='cell']/div[contains(text(),'Software Engineer')]");
+      let rows = await this.getARow('User1');
       console.log("rows", await rows.count());
       let rowsCount = await rows.count();
       for (let i = 0; i < rowsCount; i++) {
         let get = await this.getARow(value);
-        await get.locator("../..//i[@class='oxd-icon bi-trash']").first().click();
-        await this.page.waitForSelector(this.attachments.confirmationPopup);
-        await this.page.locator(this.attachments.popupDeleteButton).click();
+        await get.locator(this.trashPath).first().click();
+        await this.waitForElement(this.attachments.confirmationPopup);
+        await this.click(this.attachments.popupDeleteButton);
         let toastMsg = await this.getToastMessage();
         expect(toastMsg).toEqual(Constants.sucessMsg.successfulDeletedMsg);
         await this.clickCloseIcon();
@@ -202,43 +252,42 @@ export class Utils {
 
   // This function is used to get the "specific row"
   async getARow(value) {
-    await this.page.waitForSelector(`//div[@class='oxd-table-card']//div[@role='cell']/div[contains(text(),'${value}')]`);
-    return this.page.locator(`//div[@class='oxd-table-card']//div[@role='cell']/div[contains(text(),'${value}')]`);
+    await this.page.waitForSelector(this.row(value));
+    return this.page.locator(this.row(value));
   }
 
   async createUsers(firstName, lastName, userName) {
     await this.clickMenu("link", homePage.homePageElements.pim, "PIM");
-    await this.click("//a[text()='Add Employee']");
-    await this.page.waitForTimeout(4000);
-    await this.clearTextBoxValues("[name='firstName']");
-    await this.fillTextBoxValues("[name='firstName']", firstName);
-    await this.clearTextBoxValues("[name='lastName']");
-    await this.fillTextBoxValues("[name='lastName']", lastName);
-    await this.click('.oxd-switch-wrapper input');
-    await this.fillTextBoxValues("//label[text()='Username']/../..//input", userName);
-    await this.fillTextBoxValues("//label[text()='Password']/../..//input", "Testuser@12");
-    await this.fillTextBoxValues("//label[text()='Confirm Password']/../..//input", "Testuser@12");
+    await this.click(this.addEmployee);
+    await this.page.waitForLoadState("networkidle", { timeout: 10000 });
+    // await this.page.waitForTimeout(4000);
+    await this.fillTextBoxValues(this.firstName, firstName, true);
+    await this.fillTextBoxValues(this.lastName, lastName, true);
+    await this.click(this.switch);
+    await this.fillTextBoxValues(this.userName, userName, true);
+    await this.fillTextBoxValues(this.password, "Testuser@12", true);
+    await this.fillTextBoxValues(this.confirmPassword, "Testuser@12", true);
     // await myInfoPage.click("[type='submit]");
-    await this.clickSave(this.save, 1, Constants.sucessMsg.sucessfulSavedMsg);
-    await this.click("//a[text()='Job']");
-    await this.page.waitForTimeout(4000);
-    await this.fillDateValue("//label[text()='Joined Date']/../..//input", "2023-03-10");
-    await this.selecDropdownOption("option", "//label[text()='Job Title']/../..//div[@class='oxd-select-text-input']", "Software Engineer");
-    await this.selecDropdownOption("option", "//label[text()='Location']/../..//div[@class='oxd-select-text-input']", "Texas R&D");
+    await this.clickSave(this.save, 0, Constants.sucessMsg.sucessfulSavedMsg);
+    await this.click(this.job);
+    await this.page.waitForLoadState("networkidle", { timeout: 10000 });
+    // await this.page.waitForTimeout(4000);
+    await this.fillDateValue(this.joinedDate, "2023-03-10");
+    await this.selecDropdownOption("option", this.jobTitle, "Software Engineer");
+    await this.selecDropdownOption("option", this.location, "Texas R&D");
     await this.clickSave(this.save, 0);
   }
 
   async updatingUserRole(userName, userRole) {
-    // await myInfoPage.click("[type='submit']");
     await this.clickMenu("link", homePage.homePageElements.admin, userRole);
-    await this.fillTextBoxValues("//label[text()='Username']/../..//input", userName);
-    await this.click("[type='submit']");
-    await this.page.waitForTimeout(3000);
+    await this.fillTextBoxValues(this.userName, userName, true);
+    await this.click(this.search);
+    await this.page.waitForTimeout(2000);
     await this.click(this.editIcon);
-    await this.waitForContainer();
-    await this.page.waitForTimeout(3000);
-    // await myInfoPage.click("//label[text()='User Role']/../..//div[@class='oxd-select-text-input']");
-    await this.selecDropdownOption("option", "//label[text()='User Role']/../..//div[@class='oxd-select-text-input']", "Admin");
-    await this.clickSave(this.save, 1, Constants.sucessMsg.successfulUpdatedMsg);
+    await this.page.waitForLoadState("networkidle", { timeout: 10000 });
+    await this.waitForElement(this.backgroundContainer);
+    // await this.page.waitForTimeout(3000);
+    await this.selecDropdownOption("option", this.userRole, "Admin");
+    await this.clickSave(this.save, 0, Constants.sucessMsg.successfulUpdatedMsg);
   }
 }

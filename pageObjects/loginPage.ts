@@ -1,4 +1,7 @@
-import { Page } from "@playwright/test";
+import { Page, expect } from "@playwright/test";
+import { HomePage } from "./homePage";
+
+let homePage: HomePage;
 
 export class LoginPage {
     readonly page: Page;
@@ -6,10 +9,11 @@ export class LoginPage {
 
     constructor(page: Page) {
         this.page = page;
+        homePage = new HomePage(page);
         this.loginElements = {
             userName: '[name="username"]',
             password: '[name="password"]',
-            loginButton: '[type="submit"]'
+            loginButton: "//button[normalize-space()='Login']"
         }
     }
 
@@ -30,17 +34,19 @@ export class LoginPage {
         return this.loginElements.password;
     };
 
-    // This function is used to get the "Password" element
+    // This function is used to login into application
     async fillUsrNameAndPwdAndLogin(userName: string, password: string) {
         let getUserNameElem = await this.getUserNameElement();
         await this.page.locator(getUserNameElem).fill(userName);
         await this.page.locator(await this.getPasswordElement()).fill(password);
         await this.clickLogin();
+        await expect(this.page).toHaveURL(/.*dashboard/);
+        await this.page.waitForSelector(homePage.homePageElements.dashboardGrid);
     }
 
     // This function is used to click on the "Login" button
     async clickLogin() {
-        await this.page.waitForSelector(this.loginElements.loginButton);
+        await (await this.page.waitForSelector(this.loginElements.loginButton)).waitForElementState("stable");
         await this.page.locator(this.loginElements.loginButton).click();
     };
 }

@@ -26,14 +26,18 @@ export class MyInfoPage {
     readonly qualifications: any;
     readonly addBtn: any;
     readonly memberships: any;
+    readonly reportTo: string;
+    readonly submit: string;
 
     constructor(page: Page) {
         this.page = page;
         utils = new Utils(page);
-        this.save = 'button.oxd-button--medium';
+        this.save = "//button[normalize-space()='Save']";
+        this.submit = "//button[normalize-space()='Submit']";
         this.container = '.orangehrm-edit-employee-content';
         this.backgroundContainer = '.orangehrm-background-container';
         this.nameInputField = '//label[text()="Name"]/../..//div/input';
+        this.reportTo = "//a[text()='Report-to']";
         this.myInfoPersonalDetails = {
             firstName: 'input.orangehrm-firstname',
             middleName: 'input.orangehrm-middlename',
@@ -45,8 +49,8 @@ export class MyInfoPage {
             licenseExpiryDate: `//label[text()='License Expiry Date']/../..//div/input`,
             ssnNumber: '//label[text()="SSN Number"]/../..//div/input',
             sinNumber: '//label[text()="SIN Number"]/../..//div/input',
-            nationality: `//label[text()='Nationality']/../../..//div[@class='oxd-select-text--after']`,
-            maritalStatus: `//label[text()='Marital Status']/../../..//div[@class='oxd-select-text--after']`,
+            nationality: `//label[text()='Nationality']/../../..//div[contains(@class,'text-input')]`,
+            maritalStatus: `//label[text()='Marital Status']/../../..//div[contains(@class,'text-input')]`,
             dateofBirth: `//label[text()='Date of Birth']/../..//div/input`,
             gender: '//label[text()="Gender"]/../../..//div[@class="oxd-radio-wrapper"]/label/input[@value="1"]',
             militaryService: `//label[text()='Military Service']/../..//div/input`,
@@ -60,7 +64,7 @@ export class MyInfoPage {
         this.attachments = {
             browseButton: '//div[text()="Browse"]',
             uploadElement: '.oxd-file-input',
-            cancel: '.oxd-form-actions button[type="button"]',
+            cancel: "//button[normalize-space()='Cancel']",
             noRecordsText: '.orangehrm-horizontal-padding .oxd-text.oxd-text--span',
             attachmentCheckBox: "(//i[contains(@class,'oxd-icon bi-check')])[2]",
             deleteSelectedButton: 'button.orangehrm-horizontal-margin',
@@ -69,7 +73,7 @@ export class MyInfoPage {
             popupText: 'p.oxd-text--card-body',
             attachemtRow: 'div.oxd-table-card',
             table: '.oxd-table-body',
-            popupDeleteButton: '(//div[@class="orangehrm-modal-footer"]//button)[2]'
+            popupDeleteButton: "//button[normalize-space()='Yes, Delete']"
         }
         this.contactDetailsLocators = {
             contactDetails: '//a[text()="Contact Details"]',
@@ -83,7 +87,7 @@ export class MyInfoPage {
             work: '//label[text()="Work"]/../..//div/input',
             workEmail: '//label[text()="Work Email"]/../..//div/input',
             otherEmail: '//label[text()="Other Email"]/../..//div/input',
-            country: '//label[text()="Country"]/../../..//div[@class="oxd-select-text--after"]'
+            country: "//label[text()='Country']/../../..//div[contains(@class,'text-input')]"
         }
         this.emergencyContactDetails = {
             emergencyContactMenuLink: `//a[text()="Emergency Contacts"]`,
@@ -94,17 +98,17 @@ export class MyInfoPage {
         }
         this.dependentsDetails = {
             dependentsMenuLink: `//a[text()="Dependents"]`,
-            relationship: '//label[text()="Relationship"]/../../..//div[@class="oxd-select-text--after"]'
+            relationship: "//label[text()='Relationship']/../../..//div[contains(@class,'text-input')]"
         }
         this.immigrationDetails = {
             immigrationDetailsMenuLink: '//a[text()="Immigration"]',
             passportOption: '//div[@class="oxd-radio-wrapper"]//input[@value="1"]',
-            number: '//label[text()="Number"]/../..//input[@class="oxd-input oxd-input--active"]',
-            issuedDate: '//label[text()="Issued Date"]/../..//input[@class="oxd-input oxd-input--active"]',
-            expiryDate: '//label[text()="Expiry Date"]/../..//input[@class="oxd-input oxd-input--active"]',
-            eligibleStatus: '//label[text()="Eligible Status"]/../..//input[@class="oxd-input oxd-input--active"]',
-            issuedBy: "//label[text()='Issued By']/../../..//div[@class='oxd-select-text oxd-select-text--active']",
-            eligibleReviewDate: '//label[text()="Eligible Review Date"]/../..//input[@class="oxd-input oxd-input--active"]',
+            number: '//label[text()="Number"]/../..//input[contains(@class,"oxd-input")]',
+            issuedDate: '//label[text()="Issued Date"]/../..//input[contains(@class,"oxd-input")]',
+            expiryDate: '//label[text()="Expiry Date"]/../..//input[contains(@class,"oxd-input")]',
+            eligibleStatus: '//label[text()="Eligible Status"]/../..//input[contains(@class,"oxd-input")]',
+            issuedBy: "//label[text()='Issued By']/../../..//div[contains(@class,'text-input')]",
+            eligibleReviewDate: '//label[text()="Eligible Review Date"]/../../..//input[contains(@class,"oxd-input")]',
             comments: '[placeholder="Type Comments here"]',
             comment: '[placeholder="Type comment here"]',
         }
@@ -120,7 +124,7 @@ export class MyInfoPage {
             qualificationComment: '.oxd-input-group .oxd-textarea'
         }
         this.education = {
-            level: "//label[text()='Level']/../../..//div[@class='oxd-select-text oxd-select-text--active']",
+            level: "//label[text()='Level']/../../..//div[contains(@class,'text-input')]",
             institute: "//label[text()='Institute']/../..//input",
             majorOrSpecialization: "//label[text()='Major/Specialization']/../..//input",
             year: "//label[text()='Year']/../..//input",
@@ -129,27 +133,27 @@ export class MyInfoPage {
             endDate: "//label[text()='End Date']/../..//input"
         }
         this.skills = {
-            skill: "//label[text()='Skill']/../../..//div[@class='oxd-select-text oxd-select-text--active']",
+            skill: "//label[text()='Skill']/../../..//div[contains(@class,'text-input')]",
             yearsOfExperience: "//label[text()='Years of Experience']/../..//input",
             comment: '//h6[.="Add Skill"]/..//textarea'
         }
         this.languages = {
-            language: "//label[text()='Language']/../../..//div[@class='oxd-select-text-input']",
-            fluency: "//label[text()='Fluency']/../../..//div[@class='oxd-select-text-input']",
-            competency: "//label[text()='Competency']/../../..//div[@class='oxd-select-text-input']",
+            language: "//label[text()='Language']/../../..//div[contains(@class,'text-input')]",
+            fluency: "//label[text()='Fluency']/../../..//div[contains(@class,'text-input')]",
+            competency: "//label[text()='Competency']/../../..//div[contains(@class,'text-input')]",
             comment: '//h6[.="Add Language"]/..//textarea'
         }
         this.license = {
-            licenseType: "//label[text()='License Type']/../../..//div[@class='oxd-select-text-input']",
+            licenseType: "//label[text()='License Type']/../../..//div[contains(@class,'text-input')]",
             licenseNumber: "//label[text()='License Number']/../..//input",
             issuedDate: "//label[text()='Issued Date']/../..//input",
             expiryDate: "//label[text()='Expiry Date']/../..//input"
         }
         this.memberships = {
             membershipMenuLink: "//a[text()='Memberships']",
-            membership: "//label[text()='Membership']/../../..//div[@class='oxd-select-text-input']",
-            subscriptionPaidBy: "//label[text()='Subscription Paid By']/../../..//div[@class='oxd-select-text-input']",
-            currency: "//label[text()='Currency']/../../..//div[@class='oxd-select-text-input']",
+            membership: "//label[text()='Membership']/../../..//div[contains(@class,'text-input')]",
+            subscriptionPaidBy: "//label[text()='Subscription Paid By']/../../..//div[contains(@class,'text-input')]",
+            currency: "//label[text()='Currency']/../../..//div[contains(@class,'text-input')]",
             subscriptionAmount: "//label[text()='Subscription Amount']/../..//input",
             subscriptionCommenceDate: "//label[text()='Subscription Commence Date']/../..//input",
             subscriptionRenewalDate: "//label[text()='Subscription Renewal Date']/../..//input"
@@ -161,10 +165,10 @@ export class MyInfoPage {
 
     // This function is used to "click on Add button"
     async clickAddButton(section: string) {
-        await (await this.page.waitForSelector(`//h6[text()='${section}']/following-sibling::button`)).waitForElementState("stable");
-        let element = await this.addBtn(section);
-        let addButton = this.page.locator(element);
+        await (await this.page.waitForSelector(await this.addBtn(section))).waitForElementState("stable");
+        let addButton = this.page.locator(await this.addBtn(section));
         await addButton.click();
+        await utils.waitForSpinnerToDisappear();
         await (await this.page.waitForSelector(this.container)).waitForElementState("stable");
     }
 
@@ -197,7 +201,7 @@ export class MyInfoPage {
         //     await filechooser.setFiles('uploadTextFile.txt')
         //   });
         await this.page.setInputFiles(this.attachments.uploadElement, filePath);
-        await utils.fillTextBoxValues(this.immigrationDetails.comment, Constants.fillText.comment);
+        await utils.fillTextBoxValues(this.immigrationDetails.comment, Constants.fillText.comment, true);
         if (save) {
             await (await this.page.waitForSelector(this.save)).waitForElementState("stable");
             await this.page.locator(this.save).last().click();

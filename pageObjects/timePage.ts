@@ -1,14 +1,10 @@
 import { Page, expect } from "@playwright/test";
 import Constants from '../support/constants.json';
 import { Utils } from "../support/utils";
-import { DirectoryPage } from "./directoryPage";
-import { HomePage } from "./homePage";
-import { PerformancePage } from "./performancePage";
 import { MyInfoPage } from "./myInfoPage";
 
 
-let utils: Utils, homePage: HomePage, directoryPage: DirectoryPage, myInfoPage: MyInfoPage;
-let performancePage: PerformancePage;
+let utils: Utils, myInfoPage: MyInfoPage;
 
 export class TimePage {
     readonly page: Page;
@@ -23,17 +19,18 @@ export class TimePage {
     readonly timesheets: any;
     readonly reports: any;
     readonly attendance: any;
+    readonly trashPath: string;
+    readonly add: string;
 
     constructor(page: Page) {
         this.page = page;
         utils = new Utils(page);
-        homePage = new HomePage(page);
         myInfoPage = new MyInfoPage(page);
-        directoryPage = new DirectoryPage(page);
-        performancePage = new PerformancePage(page);
         this.name = "//label[text()='Name']/../..//input";
         this.description = "//label[text()='Description']/../..//textarea";
         this.save = "[role='document'] button[type='submit']";
+        this.add = "//button[normalize-space()='Add']";
+        this.trashPath = "../..//i[@class='oxd-icon bi-trash']";
         this.timeElements = {
             timesheets: "//span[text()='Timesheets ']",
             myTimesheets: "//a[text()='My Timesheets']",
@@ -66,8 +63,8 @@ export class TimePage {
         this.punchInOut = {
             time: "//label[text()='Time']/../..//input",
             note: "//label[text()='Note']/../..//textarea",
-            in: "//button[text()=' In ']",
-            out: "//button[text()=' Out ']"
+            in: "//button[normalize-space()='In']",
+            out: "//button[normalize-space()='Out']"
         }
         this.attendance = {
             tableData: ".oxd-table-card div.oxd-table-row",
@@ -81,6 +78,7 @@ export class TimePage {
             minimize: ".oxd-icon.bi-fullscreen-exit",
             totalDurationHours: ".rgRow div.col-alt",
             reportsTableContainer: ".orangehrm-paper-container",
+            activityName: ".rgRow .cell-action"
         }
         this.projects = {
             customerName: "//label[text()='Customer Name']/../..//input",
@@ -91,7 +89,7 @@ export class TimePage {
             addCustomerDialogName: "//div[@role='document']//label[text()='Name']/../..//input",
             addCustomerDialogDescription: "//div[@role='document']//label[text()='Description']/../..//textarea",
             filterArea: ".oxd-table-filter-area",
-            search: "[type='submit']"
+            search: "//button[normalize-space()='Search']"
         }
         this.customerRowCells = (companyName) => {
             return `//div[@class='oxd-table-card']/div[@role='row']//div[text()='${companyName}']/../..//div[@role="cell"]`;
@@ -101,7 +99,7 @@ export class TimePage {
         }
     }
 
-    // This function is used to "get a Row cells values" by its Column Text
+    // This function is used to get a "Specific Row cell values" by its Column Text
     async getARowByColumnText(companyName: string) {
         await this.page.waitForSelector(await this.cusomterRow(companyName));
         let rowCells = this.page.locator(await this.customerRowCells(companyName));
@@ -113,6 +111,7 @@ export class TimePage {
         }
     }
 
+    // This function is used to get a "Specific Row cell values" by its Column Text for Timesheet Action table
     async getTimesheetActionTable(user: string) {
         await this.page.waitForSelector(await this.cusomterRow(user));
         let rowCells = this.page.locator(await this.customerRowCells(user));
@@ -125,6 +124,7 @@ export class TimePage {
         }
     }
 
+    // This function is used to get a "Specific Row cell values" by its Column Text for Attendance table
     async getAttendanceRowCells(value: string) {
         await (await this.page.waitForSelector(await this.cusomterRow(value))).waitForElementState("stable");
         let rowCells = await this.page.locator(await this.customerRowCells(value));
@@ -140,6 +140,21 @@ export class TimePage {
         }
     }
 
+    // This function is used to add a new Customer
+    async addCustomer() {
+        let isCustomerPresent = await utils.isElementVisible(await this.cusomterRow("APlay Test Ltd"));
+        console.log("isCustomerPresent", isCustomerPresent);
+        if (!isCustomerPresent) {
+            await utils.click(this.add);
+            await utils.fillTextBoxValues(this.name, "APlay Test Ltd", true);
+            await utils.fillTextBoxValues(this.description, "An AI Company", true);
+            await utils.clickSave(myInfoPage.save, 0, Constants.sucessMsg.sucessfulSavedMsg);
+            let cellValues = await this.getARowByColumnText("APlay Test Ltd");
+            expect(cellValues.companyName).toEqual("APlay Test Ltd");
+        }
+    }
+
+    // This function is used to delete a existing Customers
     async deleteCustomers() {
         let rowLength = await this.page.locator(this.cusomterRow('APlay Test Ltd')).count();
         for (let i = 0; i < rowLength; i++) {
@@ -149,11 +164,81 @@ export class TimePage {
             if (isCustomerAlreadyPresent) {
                 let matchedRow = await this.cusomterRow('APlay Test Ltd');
                 console.log("match", matchedRow);
-                await this.page.locator(matchedRow).locator("../..//i[@class='oxd-icon bi-trash']").click({ force: true });
+                await this.page.locator(matchedRow).locator(this.trashPath).click({ force: true });
                 await myInfoPage.page.waitForSelector(myInfoPage.attachments.confirmationPopup);
                 await myInfoPage.page.locator(myInfoPage.attachments.popupDeleteButton).click();
                 expect(await utils.getToastMessage()).toEqual(Constants.sucessMsg.successfulDeletedMsg);
             }
         }
+    }
+
+    // This function is used to add a new Project
+    async addProjects() {
+        let isProjectPresent = await utils.isElementVisible(await this.cusomterRow("Demo Play Project"));
+        console.log("isProjectPresent", isProjectPresent);
+        if (!isProjectPresent) {
+            await utils.click(this.add);
+            await utils.fillTextBoxValues(this.name, "Demo Play Project", true);
+            await utils.fillTextBoxValues(this.projects.customerName, "APlay Test", true);
+            await utils.clickOption('option', "APlay Test Ltd");
+            await utils.fillTextBoxValues(this.description, "An AI Project", true);
+            await utils.clickSave(myInfoPage.save, 0);
+            await utils.click(this.add);
+            await utils.waitForElement(this.projects.addCustomerDialog);
+            await utils.fillTextBoxValues(this.projects.addCustomerDialogName, "Aplay", true);
+            await utils.clickSave(myInfoPage.save, 1, Constants.sucessMsg.sucessfulSavedMsg);
+            await utils.clickSave(myInfoPage.save, 0, Constants.sucessMsg.successfulUpdatedMsg);
+            await utils.waitForElement(this.projects.filterArea);
+            await utils.fillTextBoxValues(this.projects.customerName, "APlay Test Ltd", true);
+            await utils.clickOption('option', "APlay Test Ltd");
+            await utils.fillTextBoxValues(this.projects.project, "Demo Play Project", true);
+            await utils.clickOption('option', "Demo Play Project");
+            await utils.click(this.projects.search);
+        }
+    }
+
+     // This function is used to fill the Timesheet Hours
+    async fillTimesheetHours() {
+        for (let i = 0; i < 5; i++) {
+            let inputCell = this.page.locator(this.timesheets.timeInputCell).nth(i);
+            console.log("inputCell", inputCell);
+            await this.page.locator(this.timesheets.timeInputCell).nth(i).fill("09:00");
+        }
+        await utils.clickSave(myInfoPage.save, 0, Constants.sucessMsg.sucessfulSavedMsg);
+        await this.page.waitForSelector(this.timesheets.totalhrs);
+        let total = await utils.getText(this.timesheets.totalhrs);
+        expect(total).toEqual("45:00");
+        await utils.clickSave(myInfoPage.submit, 0, Constants.sucessMsg.sucessfulSubmittedMsg);
+    }
+
+     // This function is used to fill the Punch In and Punch Out time
+    async addPunchInPunchOut() {
+        await utils.fillDateValue(this.timeElements.date, "2023-03-27");
+        await utils.fillTextBoxValues(this.punchInOut.time, "10:00 AM", true);
+        await utils.click(this.punchInOut.note);
+        await utils.fillTextBoxValues(this.punchInOut.note, "Logged in", true);
+        await utils.clickSave(this.punchInOut.in, 0, Constants.sucessMsg.sucessfulSavedMsg);
+        // await page.waitForTimeout(4000);
+        await utils.fillDateValue(this.timeElements.date, "2023-03-27");
+        await utils.fillTextBoxValues(this.punchInOut.time, "07:00 PM", true);
+        await utils.click(this.punchInOut.note);
+        await utils.fillTextBoxValues(this.punchInOut.note, "Logged out", true);
+        await utils.clickSave(this.punchInOut.out, 0, Constants.sucessMsg.sucessfulSavedMsg);
+    }
+
+     // This function is used to search and view the reports
+    async searchAndViewReports(menuItemValue, locator, textboxValue, projectValue) {
+        await utils.click(this.timeElements.reports);
+        await utils.clickByRole("menuitem", menuItemValue, true);
+        await utils.waitForElement(myInfoPage.backgroundContainer);
+        await utils.fillTextBoxValues(locator, textboxValue, true);
+        await utils.clickOption('option', projectValue);
+        await utils.click(this.timeElements.view);
+    }
+
+     // This function is used to Maximize and Minimize Reports table
+    async maximizeMinimizeReports(iconToClick, getAttributeFor) {
+        await utils.click(iconToClick);
+        return await this.page.locator(getAttributeFor).getAttribute("class");
     }
 }

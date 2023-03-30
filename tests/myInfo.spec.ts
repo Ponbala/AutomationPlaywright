@@ -32,8 +32,6 @@ test.beforeAll(async ({ browser }) => {
   await expect(page).toHaveURL(/.*login/);
   let pass = await testData.encodeDecodePassword();
   await loginPage.fillUsrNameAndPwdAndLogin(ENV.USERNAME, pass);
-  await expect(page).toHaveURL(/.*dashboard/);
-  await page.waitForSelector(homePage.homePageElements.dashboardGrid);
   await utils.clickMenu("link", homePage.homePageElements.myInfo, "My Info");
 });
 
@@ -57,7 +55,7 @@ test.describe('Personal details', () => {
     await utils.selecDropdownOption("option", myInfoPage.myInfoPersonalDetails.maritalStatus, 'Single');
     await utils.fillDateValue(myInfoPage.myInfoPersonalDetails.dateofBirth, '2000-12-26');
     await utils.click(myInfoPage.myInfoPersonalDetails.gender);
-    await utils.fillTextBoxValues(myInfoPage.myInfoPersonalDetails.militaryService, 'No');
+    await utils.fillTextBoxValues(myInfoPage.myInfoPersonalDetails.militaryService, 'No', true);
     await utils.click(myInfoPage.myInfoPersonalDetails.smoker);
     await utils.clickSave(myInfoPage.save, 0, Constants.sucessMsg.successfulUpdatedMsg);
     await utils.selecDropdownOption("option", myInfoPage.myInfoPersonalDetails.bloodType, 'A+');
@@ -70,8 +68,8 @@ test.describe('Personal details', () => {
 
   test('Filling the personal details and verifying save button', async () => {
     await myInfoPage.uploadFile('uploadTextFile.txt', 'Attachments', true);
-    await (await page.waitForSelector(myInfoPage.attachments.table)).waitForElementState("stable");
-    let table = page.locator(myInfoPage.attachments.table);
+    await utils.waitForElement(myInfoPage.attachments.table);
+    let table = await utils.getElement(myInfoPage.attachments.table);
     expect(table).toBeVisible();
   });
 
@@ -101,7 +99,7 @@ test.describe('Emergency Contacts', () => {
     await utils.clickMenu('link', myInfoPage.emergencyContactDetails.emergencyContactMenuLink, 'Emergency Contacts');
     await myInfoPage.clickAddButton('Assigned Emergency Contacts');
     await utils.fillFieldValues(emergencyContactLocators, emergencyContactValues);
-    await utils.clickSave(myInfoPage.save, 1, Constants.sucessMsg.sucessfulSavedMsg);
+    await utils.clickSave(myInfoPage.save, 0, Constants.sucessMsg.sucessfulSavedMsg);
     await myInfoPage.uploadFile('uploadTextFile.txt', 'Attachments', true);
   });
 });
@@ -110,11 +108,10 @@ test.describe('Dependents', () => {
   test('Filling Dependents details', async () => {
     await utils.clickMenu('link', myInfoPage.dependentsDetails.dependentsMenuLink, 'Dependents');
     await myInfoPage.clickAddButton('Assigned Dependents');
-    await utils.clearTextBoxValues(myInfoPage.nameInputField);
-    await utils.fillTextBoxValues(myInfoPage.nameInputField, 'Gob');
+    await utils.fillTextBoxValues(myInfoPage.nameInputField, 'Gob', true);
     await utils.selecDropdownOption("option", myInfoPage.dependentsDetails.relationship, 'Child');
     await utils.fillDateValue(myInfoPage.myInfoPersonalDetails.dateofBirth, '2000-12-26');
-    await utils.clickSave(myInfoPage.save, 1, Constants.sucessMsg.sucessfulSavedMsg);
+    await utils.clickSave(myInfoPage.save, 0, Constants.sucessMsg.sucessfulSavedMsg);
     await myInfoPage.uploadFile('uploadTextFile.txt', 'Attachments', true);
   });
 });
@@ -126,46 +123,46 @@ test.describe('Immigration', () => {
     await utils.click(myInfoPage.immigrationDetails.passportOption);
     await utils.fillDateValue(myInfoPage.immigrationDetails.issuedDate, '2023-03-10');
     await utils.fillDateValue(myInfoPage.immigrationDetails.expiryDate, '2023-03-28');
-    await utils.fillTextBoxValues(myInfoPage.immigrationDetails.eligibleStatus, 'Active');
+    await utils.fillTextBoxValues(myInfoPage.immigrationDetails.eligibleStatus, 'Active', true);
     await utils.selecDropdownOption("option", myInfoPage.immigrationDetails.issuedBy, 'Albania');
     await utils.fillDateValue(myInfoPage.immigrationDetails.eligibleReviewDate, '2023-03-28');
-    await utils.fillTextBoxValues(myInfoPage.immigrationDetails.comments, 'Immigration details has been filled');
-    await utils.fillTextBoxValues(myInfoPage.immigrationDetails.number, '1234567');
-    await utils.clickSave(myInfoPage.save, 1, Constants.sucessMsg.sucessfulSavedMsg);
+    await utils.fillTextBoxValues(myInfoPage.immigrationDetails.comments, 'Immigration details has been filled', true);
+    await utils.fillTextBoxValues(myInfoPage.immigrationDetails.number, '1234567', true);
+    await utils.clickSave(myInfoPage.save, 0, Constants.sucessMsg.sucessfulSavedMsg);
     await myInfoPage.uploadFile('uploadTextFile.txt', 'Attachments', true);
   });
 });
 
-test.describe('Qualification', () => {
+test.describe('Qualifications', () => {
   test('Filling Work Experience details', async () => {
     await utils.clickMenu('link', myInfoPage.qualifications.qualificationsMenuLink, 'Qualifications');
     await myInfoPage.clickAddButton('Work Experience');
-    await utils.fillTextBoxValues(myInfoPage.workExperience.company, 'AM');
-    await utils.fillTextBoxValues(myInfoPage.workExperience.jobTitle, 'Software Engineer');
+    await utils.fillTextBoxValues(myInfoPage.workExperience.company, 'AM', true);
+    await utils.fillTextBoxValues(myInfoPage.workExperience.jobTitle, 'Software Engineer', true);
     await utils.fillDateValue(myInfoPage.workExperience.fromDate, '2019-02-23');
     await utils.fillDateValue(myInfoPage.workExperience.toDate, '2025-02-23');
-    await utils.fillTextBoxValues(myInfoPage.workExperience.comment, 'Filled Work Experience fields');
-    await utils.clickSave(myInfoPage.save, 1, Constants.sucessMsg.sucessfulSavedMsg);
+    await utils.fillTextBoxValues(myInfoPage.workExperience.comment, 'Filled Work Experience fields', true);
+    await utils.clickSave(myInfoPage.save, 0, Constants.sucessMsg.sucessfulSavedMsg);
   });
 
   test('Filling Education details', async () => {
     await myInfoPage.clickAddButton('Education');
     await utils.selecDropdownOption("option", myInfoPage.education.level, "Bachelor's Degree");
-    await utils.fillTextBoxValues(myInfoPage.education.institute, 'STC');
-    await utils.fillTextBoxValues(myInfoPage.education.majorOrSpecialization, 'BSC');
-    await utils.fillTextBoxValues(myInfoPage.education.year, '2015');
-    await utils.fillTextBoxValues(myInfoPage.education.gpaScore, '7.2');
-    await utils.fillTextBoxValues(myInfoPage.education.startDate, '2012-04-15');
-    await utils.fillTextBoxValues(myInfoPage.education.endDate, '2015-04-15');
-    await utils.clickSave(myInfoPage.save, 1);
+    await utils.fillTextBoxValues(myInfoPage.education.institute, 'STC', true);
+    await utils.fillTextBoxValues(myInfoPage.education.majorOrSpecialization, 'BSC', true);
+    await utils.fillTextBoxValues(myInfoPage.education.year, '2015', true);
+    await utils.fillTextBoxValues(myInfoPage.education.gpaScore, '7.2', true);
+    await utils.fillTextBoxValues(myInfoPage.education.startDate, '2012-04-15', true);
+    await utils.fillTextBoxValues(myInfoPage.education.endDate, '2015-04-15', true);
+    await utils.clickSave(myInfoPage.save, 0);
   });
 
   test('Filling Skills details', async () => {
     await myInfoPage.clickAddButton('Skills');
     await utils.selecDropdownOption("option", myInfoPage.skills.skill, "Java");
-    await utils.fillTextBoxValues(myInfoPage.skills.yearsOfExperience, '4');
-    await utils.fillTextBoxValues(myInfoPage.skills.comment, 'Filled Skills fields');
-    await utils.clickSave(myInfoPage.save, 1);
+    await utils.fillTextBoxValues(myInfoPage.skills.yearsOfExperience, '4', true);
+    await utils.fillTextBoxValues(myInfoPage.skills.comment, 'Filled Skills fields', true);
+    await utils.clickSave(myInfoPage.save, 0);
   });
 
   test('Filling Languages details', async () => {
@@ -174,17 +171,17 @@ test.describe('Qualification', () => {
     await utils.selecDropdownOption("option", myInfoPage.languages.language, "English");
     await utils.selecDropdownOption("option", myInfoPage.languages.fluency, "Writing");
     await utils.selecDropdownOption("option", myInfoPage.languages.competency, "Good");
-    await utils.fillTextBoxValues(myInfoPage.languages.comment, 'Filled Languages fields');
-    await utils.clickSave(myInfoPage.save, 1);
+    await utils.fillTextBoxValues(myInfoPage.languages.comment, 'Filled Languages fields', true);
+    await utils.clickSave(myInfoPage.save, 0);
   });
 
   test('Filling License details', async () => {
     await myInfoPage.clickAddButton('License');
     await utils.selecDropdownOption("option", myInfoPage.license.licenseType, "Cisco Certified Network Associate (CCNA)");
-    await utils.fillTextBoxValues(myInfoPage.license.licenseNumber, "123456");
-    await utils.fillTextBoxValues(myInfoPage.license.issuedDate, '2015-04-15');
-    await utils.fillTextBoxValues(myInfoPage.license.expiryDate, '2015-05-15');
-    await utils.clickSave(myInfoPage.save, 1);
+    await utils.fillTextBoxValues(myInfoPage.license.licenseNumber, "123456", true);
+    await utils.fillTextBoxValues(myInfoPage.license.issuedDate, '2015-04-15', true);
+    await utils.fillTextBoxValues(myInfoPage.license.expiryDate, '2015-05-15', true);
+    await utils.clickSave(myInfoPage.save, 0);
   });
 
   test('Attachment section', async () => {
@@ -198,11 +195,11 @@ test.describe('Memberships', () => {
     await myInfoPage.clickAddButton('Assigned Memberships');
     await utils.selecDropdownOption("option", myInfoPage.memberships.membership, "ACCA");
     await utils.selecDropdownOption("option", myInfoPage.memberships.subscriptionPaidBy, "Company");
-    await utils.fillTextBoxValues(myInfoPage.memberships.subscriptionAmount, "42000");
+    await utils.fillTextBoxValues(myInfoPage.memberships.subscriptionAmount, "42000", true);
     await utils.selecDropdownOption("option", myInfoPage.memberships.currency, "Indian Rupee");
-    await utils.fillTextBoxValues(myInfoPage.memberships.subscriptionCommenceDate, "2023-03-21");
-    await utils.fillTextBoxValues(myInfoPage.memberships.subscriptionRenewalDate, "2023-03-23");
-    await utils.clickSave(myInfoPage.save, 1);
+    await utils.fillTextBoxValues(myInfoPage.memberships.subscriptionCommenceDate, "2023-03-21", true);
+    await utils.fillTextBoxValues(myInfoPage.memberships.subscriptionRenewalDate, "2023-03-23", true);
+    await utils.clickSave(myInfoPage.save, 0);
     await myInfoPage.uploadFile('uploadTextFile.txt', 'Attachments', true);
   });
 });
