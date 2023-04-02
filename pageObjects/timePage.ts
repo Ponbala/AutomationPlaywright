@@ -64,7 +64,8 @@ export class TimePage {
             time: "//label[text()='Time']/../..//input",
             note: "//label[text()='Note']/../..//textarea",
             in: "//button[normalize-space()='In']",
-            out: "//button[normalize-space()='Out']"
+            out: "//button[normalize-space()='Out']",
+            punchOutContainer: ".orangehrm-card-container"
         }
         this.attendance = {
             tableData: ".oxd-table-card div.oxd-table-row",
@@ -129,7 +130,6 @@ export class TimePage {
         await (await this.page.waitForSelector(await this.cusomterRow(value))).waitForElementState("stable");
         let rowCells = await this.page.locator(await this.customerRowCells(value));
         let rowcellsText = await rowCells.allTextContents();
-        console.log("rowcellsText", rowcellsText);
         return {
             checkbox: rowcellsText[0],
             punchIn: rowcellsText[1],
@@ -143,12 +143,11 @@ export class TimePage {
     // This function is used to add a new Customer
     async addCustomer() {
         let isCustomerPresent = await utils.isElementVisible(await this.cusomterRow("APlay Test Ltd"));
-        console.log("isCustomerPresent", isCustomerPresent);
         if (!isCustomerPresent) {
             await utils.click(this.add);
             await utils.fillTextBoxValues(this.name, "APlay Test Ltd", true);
             await utils.fillTextBoxValues(this.description, "An AI Company", true);
-            await utils.clickSave(myInfoPage.save, 0, Constants.sucessMsg.sucessfulSavedMsg);
+            await utils.clickSave(myInfoPage.save, 0);
             let cellValues = await this.getARowByColumnText("APlay Test Ltd");
             expect(cellValues.companyName).toEqual("APlay Test Ltd");
         }
@@ -160,10 +159,8 @@ export class TimePage {
         for (let i = 0; i < rowLength; i++) {
             let row = await this.cusomterRow('APlay Test Ltd');
             let isCustomerAlreadyPresent = await this.page.locator(row).isVisible();
-            console.log("isCustomerAlreadyPresent", isCustomerAlreadyPresent);
             if (isCustomerAlreadyPresent) {
                 let matchedRow = await this.cusomterRow('APlay Test Ltd');
-                console.log("match", matchedRow);
                 await this.page.locator(matchedRow).locator(this.trashPath).click({ force: true });
                 await myInfoPage.page.waitForSelector(myInfoPage.attachments.confirmationPopup);
                 await myInfoPage.page.locator(myInfoPage.attachments.popupDeleteButton).click();
@@ -175,7 +172,6 @@ export class TimePage {
     // This function is used to add a new Project
     async addProjects() {
         let isProjectPresent = await utils.isElementVisible(await this.cusomterRow("Demo Play Project"));
-        console.log("isProjectPresent", isProjectPresent);
         if (!isProjectPresent) {
             await utils.click(this.add);
             await utils.fillTextBoxValues(this.name, "Demo Play Project", true);
@@ -186,8 +182,8 @@ export class TimePage {
             await utils.click(this.add);
             await utils.waitForElement(this.projects.addCustomerDialog);
             await utils.fillTextBoxValues(this.projects.addCustomerDialogName, "Aplay", true);
-            await utils.clickSave(myInfoPage.save, 1, Constants.sucessMsg.sucessfulSavedMsg);
-            await utils.clickSave(myInfoPage.save, 0, Constants.sucessMsg.successfulUpdatedMsg);
+            await utils.clickSave(myInfoPage.save, 1);
+            await utils.clickSave(myInfoPage.save, 0, Constants.sucessMsg.sucessfulSavedMsg);
             await utils.waitForElement(this.projects.filterArea);
             await utils.fillTextBoxValues(this.projects.customerName, "APlay Test Ltd", true);
             await utils.clickOption('option', "APlay Test Ltd");
@@ -197,36 +193,36 @@ export class TimePage {
         }
     }
 
-     // This function is used to fill the Timesheet Hours
+    // This function is used to fill the Timesheet Hours
     async fillTimesheetHours() {
         for (let i = 0; i < 5; i++) {
-            let inputCell = this.page.locator(this.timesheets.timeInputCell).nth(i);
-            console.log("inputCell", inputCell);
             await this.page.locator(this.timesheets.timeInputCell).nth(i).fill("09:00");
         }
-        await utils.clickSave(myInfoPage.save, 0, Constants.sucessMsg.sucessfulSavedMsg);
+        await utils.clickSave(myInfoPage.save, 0);
         await this.page.waitForSelector(this.timesheets.totalhrs);
         let total = await utils.getText(this.timesheets.totalhrs);
         expect(total).toEqual("45:00");
-        await utils.clickSave(myInfoPage.submit, 0, Constants.sucessMsg.sucessfulSubmittedMsg);
+        await utils.clickSave(myInfoPage.submit, 0);
     }
 
-     // This function is used to fill the Punch In and Punch Out time
+    // This function is used to fill the Punch In and Punch Out time
     async addPunchInPunchOut() {
-        await utils.fillDateValue(this.timeElements.date, "2023-03-27");
+        await utils.fillDateValue(this.timeElements.date, "2023-03-28");
         await utils.fillTextBoxValues(this.punchInOut.time, "10:00 AM", true);
         await utils.click(this.punchInOut.note);
         await utils.fillTextBoxValues(this.punchInOut.note, "Logged in", true);
-        await utils.clickSave(this.punchInOut.in, 0, Constants.sucessMsg.sucessfulSavedMsg);
-        // await page.waitForTimeout(4000);
-        await utils.fillDateValue(this.timeElements.date, "2023-03-27");
+        await utils.clickSave(this.punchInOut.in, 0);
+        await utils.clickCloseIcon();
+        await utils.waitForElement(this.punchInOut.punchOutContainer);
+        await this.page.waitForTimeout(6000);
+        await utils.fillDateValue(this.timeElements.date, "2023-03-28");
         await utils.fillTextBoxValues(this.punchInOut.time, "07:00 PM", true);
         await utils.click(this.punchInOut.note);
         await utils.fillTextBoxValues(this.punchInOut.note, "Logged out", true);
-        await utils.clickSave(this.punchInOut.out, 0, Constants.sucessMsg.sucessfulSavedMsg);
+        await utils.clickSave(this.punchInOut.out, 0);
     }
 
-     // This function is used to search and view the reports
+    // This function is used to search and view the reports
     async searchAndViewReports(menuItemValue, locator, textboxValue, projectValue) {
         await utils.click(this.timeElements.reports);
         await utils.clickByRole("menuitem", menuItemValue, true);
@@ -236,7 +232,7 @@ export class TimePage {
         await utils.click(this.timeElements.view);
     }
 
-     // This function is used to Maximize and Minimize Reports table
+    // This function is used to Maximize and Minimize Reports table
     async maximizeMinimizeReports(iconToClick, getAttributeFor) {
         await utils.click(iconToClick);
         return await this.page.locator(getAttributeFor).getAttribute("class");

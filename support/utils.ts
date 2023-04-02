@@ -87,7 +87,7 @@ export class Utils {
   // This function is used to wait for the spinner to appear and disappear
   async waitForSpinnerToDisappear() {
     const spinner = await this.page.waitForSelector(this.spinner);
-    await spinner.waitForElementState("hidden");
+    await spinner.waitForElementState("hidden", { timeout: 6000 });
   }
 
   // This function is used to wait for the logout
@@ -130,14 +130,16 @@ export class Utils {
 
   // This function is used to click on the "Save" button
   async clickSave(locatorValue: string, index: number, messageToVerify?: string) {
-    await this.page.locator(locatorValue).nth(index).click({ delay: 3000 });
+    await this.page.locator(locatorValue).nth(index).click({ delay: 2000 });
     if (messageToVerify) {
       let toastMsg = await this.getToastMessage();
       expect(toastMsg).toEqual(messageToVerify);
       await this.clickCloseIcon();
+      let spinner = await this.page.locator(this.spinner).isVisible();
+      if (spinner) {
+        await this.waitForSpinnerToDisappear();
+      }
     }
-    // await utils.waitForSpinnerToDisappear();
-    await this.page.waitForTimeout(3000);
   }
 
   // This function is used to "click on the element"
@@ -208,7 +210,6 @@ export class Utils {
     await this.page.getByRole(role, { name: menuLinkText }).click();
     await (await this.page.waitForSelector(this.backgroundContainer)).waitForElementState("stable");
     await this.page.waitForLoadState("networkidle", { timeout: 10000 });
-    // await this.page.waitForTimeout(3000);
   }
 
   async waitForElement(locator) {
@@ -219,23 +220,19 @@ export class Utils {
     await this.clickMenu("link", homePage.homePageElements.pim, "PIM");
     await this.click(this.employeeListMenu);
     await this.fillTextBoxValues(directoryPage.directory.employeeName, "Test User", true);
-    await this.click(directoryPage.directory.search);
+    await this.page.locator(directoryPage.directory.search).click();
     await this.waitForElement(this.tableContainer);
     await this.page.waitForTimeout(5000);
-    let tableRow = await (await this.getARow('Test')).first().isVisible();
-    console.log("tableRow", tableRow);
+    let tableRow = await (this.page.locator(this.row('Test'))).first().isVisible();
     if (tableRow) {
-      await this.deleteRecords("User1");
+      await this.deleteRecords("Test");
     }
   }
 
   async deleteRecords(value) {
-    // await (await this.page.waitForSelector(this.addReview.tableRow)).waitForElementState("stable");
     let rowVisibility = await this.page.locator(this.tableRow).first().isVisible();
-    console.log("rowVisibility", rowVisibility);
     if (rowVisibility) {
-      let rows = await this.getARow('User1');
-      console.log("rows", await rows.count());
+      let rows = await this.getARow('Test');
       let rowsCount = await rows.count();
       for (let i = 0; i < rowsCount; i++) {
         let get = await this.getARow(value);
@@ -260,18 +257,18 @@ export class Utils {
     await this.clickMenu("link", homePage.homePageElements.pim, "PIM");
     await this.click(this.addEmployee);
     await this.page.waitForLoadState("networkidle", { timeout: 10000 });
-    // await this.page.waitForTimeout(4000);
+    await this.page.waitForTimeout(2000);
     await this.fillTextBoxValues(this.firstName, firstName, true);
     await this.fillTextBoxValues(this.lastName, lastName, true);
     await this.click(this.switch);
     await this.fillTextBoxValues(this.userName, userName, true);
     await this.fillTextBoxValues(this.password, "Testuser@12", true);
     await this.fillTextBoxValues(this.confirmPassword, "Testuser@12", true);
-    // await myInfoPage.click("[type='submit]");
-    await this.clickSave(this.save, 0, Constants.sucessMsg.sucessfulSavedMsg);
+    await this.clickSave(this.save, 0);
+    await this.clickCloseIcon();
+    await this.waitForElement(this.backgroundContainer);
     await this.click(this.job);
     await this.page.waitForLoadState("networkidle", { timeout: 10000 });
-    // await this.page.waitForTimeout(4000);
     await this.fillDateValue(this.joinedDate, "2023-03-10");
     await this.selecDropdownOption("option", this.jobTitle, "Software Engineer");
     await this.selecDropdownOption("option", this.location, "Texas R&D");
@@ -282,12 +279,12 @@ export class Utils {
     await this.clickMenu("link", homePage.homePageElements.admin, userRole);
     await this.fillTextBoxValues(this.userName, userName, true);
     await this.click(this.search);
-    await this.page.waitForTimeout(2000);
+    await this.waitForElement(this.row(userName));
     await this.click(this.editIcon);
     await this.page.waitForLoadState("networkidle", { timeout: 10000 });
     await this.waitForElement(this.backgroundContainer);
-    // await this.page.waitForTimeout(3000);
     await this.selecDropdownOption("option", this.userRole, "Admin");
-    await this.clickSave(this.save, 0, Constants.sucessMsg.successfulUpdatedMsg);
+    await this.clickSave(this.save, 0);
+    await this.clickCloseIcon();
   }
 }

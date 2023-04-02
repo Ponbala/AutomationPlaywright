@@ -15,6 +15,7 @@ export class PIMPage {
     readonly save: string;
     readonly name: string;
     readonly add: string;
+    readonly container: string;
 
     constructor(page: Page) {
         this.page = page;
@@ -26,6 +27,7 @@ export class PIMPage {
         this.save = "//button[normalize-space()='Save']";
         this.name = "//label[text()='Name']/../..//input";
         this.add = "//button[normalize-space()='Add']";
+        this.container = '.orangehrm-edit-employee-content';
         utils = new Utils(page);
         homePage = new HomePage(page);
     }
@@ -37,6 +39,8 @@ export class PIMPage {
         await utils.clickOption('option', employeeToSearch);
         await utils.click(this.search);
         await utils.click(this.editIcon);
+        await utils.waitForSpinnerToDisappear();
+        await utils.waitForElement(this.container)
         await utils.click(this.reportTo);
         await utils.clickElementWithIndex(this.add, 0);
         await utils.fillTextBoxValues(this.name, supervisorEmployee, true);

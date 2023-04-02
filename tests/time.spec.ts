@@ -2,10 +2,10 @@ import { test, expect, Page } from '@playwright/test';
 import Constants from '../support/constants.json';
 import { Utils } from '../support/utils';
 import { TestData } from '../testData/testData';
-import { LoginPage, HomePage, TimePage, MyInfoPage, PerformancePage } from '../pageObjects/index';
+import { LoginPage, HomePage, TimePage, MyInfoPage } from '../pageObjects/index';
 import ENV from '../support/env';
 
-let loginPage: LoginPage, homePage: HomePage, myInfoPage: MyInfoPage, performancePage: PerformancePage, timePage: TimePage, testData: TestData, page: Page, utils: Utils;
+let loginPage: LoginPage, homePage: HomePage, myInfoPage: MyInfoPage, timePage: TimePage, testData: TestData, page: Page, utils: Utils;
 
 test.beforeAll(async ({ browser }) => {
     page = await browser.newPage();
@@ -14,7 +14,6 @@ test.beforeAll(async ({ browser }) => {
     loginPage = new LoginPage(page);
     homePage = new HomePage(page);
     myInfoPage = new MyInfoPage(page);
-    performancePage = new PerformancePage(page);
     timePage = new TimePage(page);
     testData = new TestData(page);
     await loginPage.getBaseURL();
@@ -28,7 +27,6 @@ test.beforeAll(async ({ browser }) => {
     await loginPage.fillUsrNameAndPwdAndLogin("testuser1", "Testuser@12");
     await utils.clickMenu("link", homePage.homePageElements.time, "Time");
 });
-
 
 test.afterAll(async () => {
     await page.close();
@@ -60,7 +58,6 @@ test.describe('Time Timesheets', () => {
         await utils.selecDropdownOption("option", timePage.timesheets.activity, "Aplay");
         await timePage.fillTimesheetHours();
         let actionsTableCells = await timePage.getTimesheetActionTable("Test User1");
-        console.log("actions", actionsTableCells);
         expect(await actionsTableCells.actions).toEqual("Submitted");
     });
 
@@ -72,7 +69,6 @@ test.describe('Time Timesheets', () => {
         await utils.click(timePage.timeElements.view);
         await utils.waitForElement(timePage.timeElements.tableContainer);
         let actionsTableCells = await timePage.getTimesheetActionTable("Test User1");
-        console.log("actions", actionsTableCells);
         expect(await actionsTableCells.actions).toEqual("Submitted");
     });
 });
@@ -87,11 +83,10 @@ test.describe('Time Attendance', () => {
     test('View My Records', async () => {
         await utils.click(timePage.timeElements.attendance);
         await utils.clickByRole("menuitem", 'My Records', false);
-        await utils.fillDateValue(timePage.timeElements.date, "2023-03-27");
+        await utils.fillDateValue(timePage.timeElements.date, "2023-03-28");
         await utils.click(timePage.timeElements.view);
         await utils.waitForElement(timePage.timeElements.tableContainer);
-        let tableCells = await timePage.getAttendanceRowCells("Logged in");
-        console.log("actions", tableCells);
+        let tableCells = await timePage.getAttendanceRowCells("Logged out");
         expect(tableCells.duration).toEqual("9.00");
     });
 
@@ -100,11 +95,10 @@ test.describe('Time Attendance', () => {
         await utils.clickByRole("menuitem", 'Employee Records', false);
         await utils.fillDateValue(timePage.timeElements.employeeName, "Test");
         await utils.clickOption('option', "Test User1");
-        await utils.fillDateValue(timePage.timeElements.date, "2023-03-27");
+        await utils.fillDateValue(timePage.timeElements.date, "2023-03-28");
         await utils.click(timePage.timeElements.view);
         await utils.waitForElement(timePage.reports.reportsTableContainer);
-        let tableCells = await timePage.getAttendanceRowCells("Logged in");
-        console.log("actions", tableCells);
+        let tableCells = await timePage.getAttendanceRowCells("Logged out");
         expect(tableCells.duration).toEqual("9.00");
     });
 
@@ -140,10 +134,9 @@ test.describe('Time Reports', () => {
     test('Search and View Employee Attendance Summary', async () => {
         await timePage.searchAndViewReports("Attendance Summary", timePage.timeElements.employeeName, "Test", "Test User1");
         await utils.waitForElement(timePage.reports.reportsTableContainer);
-        let visible = await utils.isElementVisible(timePage.reports.employeeReportsTable);
-        console.log("visible", visible);
+        let employeeReportTable = await utils.isElementVisible(timePage.reports.employeeReportsTable);
+        expect(employeeReportTable).toBeTruthy();
         let hours = await utils.getText(timePage.reports.totalDurationHours);
-        console.log("totalHours", hours);
         expect(hours).toEqual("9.00");
     });
 });

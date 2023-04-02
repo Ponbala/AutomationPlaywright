@@ -38,6 +38,7 @@ export class MyInfoPage {
         this.backgroundContainer = '.orangehrm-background-container';
         this.nameInputField = '//label[text()="Name"]/../..//div/input';
         this.reportTo = "//a[text()='Report-to']";
+
         this.myInfoPersonalDetails = {
             firstName: 'input.orangehrm-firstname',
             middleName: 'input.orangehrm-middlename',
@@ -168,7 +169,9 @@ export class MyInfoPage {
         await (await this.page.waitForSelector(await this.addBtn(section))).waitForElementState("stable");
         let addButton = this.page.locator(await this.addBtn(section));
         await addButton.click();
-        await utils.waitForSpinnerToDisappear();
+        if (await this.page.locator(utils.spinner).first().isVisible()) {
+            await utils.waitForSpinnerToDisappear();
+        }
         await (await this.page.waitForSelector(this.container)).waitForElementState("stable");
     }
 
@@ -231,4 +234,52 @@ export class MyInfoPage {
             expect(this.page.locator(this.attachments.attachemtRow).first()).not.toBeVisible();
         }
     };
+
+    async getLocators(locatorsSection: string) {
+        let locators: string[] = [];
+        let values: string[] = [];
+        switch (locatorsSection) {
+            case "names":
+                locators = [this.myInfoPersonalDetails.firstName, this.myInfoPersonalDetails.middleName, this.myInfoPersonalDetails.lastName, this.myInfoPersonalDetails.nickName];
+                values = [Constants.EmployeeName.firstName, Constants.EmployeeName.middleName, Constants.EmployeeName.lastName, Constants.EmployeeName.nickName];
+                break;
+            case "id":
+                locators = [this.myInfoPersonalDetails.employeeId, this.myInfoPersonalDetails.otherId, this.myInfoPersonalDetails.driverLicenseNumber, this.myInfoPersonalDetails.licenseExpiryDate];
+                values = [Constants.EmployeeIDs.employeeId, Constants.EmployeeIDs.otherId, Constants.EmployeeIDs.driverLicenseNumber, Constants.EmployeeIDs.licenseExpiryDate];
+                break;
+            case "contactDetails":
+                locators = [this.contactDetailsLocators.street1, this.contactDetailsLocators.street2, this.contactDetailsLocators.city, this.contactDetailsLocators.state, this.contactDetailsLocators.zip, this.contactDetailsLocators.home, this.contactDetailsLocators.mobile, this.contactDetailsLocators.work, this.contactDetailsLocators.workEmail, this.contactDetailsLocators.otherEmail];
+                values = [Constants.EmployeeContactDetails.street1, Constants.EmployeeContactDetails.street2, Constants.EmployeeContactDetails.city, Constants.EmployeeContactDetails.state, Constants.EmployeeContactDetails.zip, Constants.EmployeeContactDetails.home, Constants.EmployeeContactDetails.mobile, Constants.EmployeeContactDetails.work, Constants.EmployeeContactDetails.workEmail, Constants.EmployeeContactDetails.otherEmail];
+                break;
+            case "emergencyContact":
+                locators = [this.nameInputField, this.emergencyContactDetails.relationship, this.emergencyContactDetails.homeTelephone, this.emergencyContactDetails.mobile, this.emergencyContactDetails.workTelephone];
+                values = [Constants.EmergencyContacts.name, Constants.EmergencyContacts.relationship, Constants.EmergencyContacts.homeTelephone, Constants.EmergencyContacts.mobile, Constants.EmergencyContacts.workTelephone];
+                break;
+            case "immigration":
+                locators = [this.immigrationDetails.issuedDate, this.immigrationDetails.expiryDate, this.immigrationDetails.eligibleStatus, this.immigrationDetails.eligibleReviewDate, this.immigrationDetails.comments, this.immigrationDetails.number];
+                values = [Constants.ImmigrationDetails.issuedDate, Constants.ImmigrationDetails.expiryDate, Constants.ImmigrationDetails.eligibleStatus, Constants.ImmigrationDetails.eligibleReviewDate, Constants.ImmigrationDetails.comments, Constants.ImmigrationDetails.number];
+                break;
+            case "workExperience":
+                locators = [this.workExperience.company, this.workExperience.jobTitle, this.workExperience.fromDate, this.workExperience.toDate, this.workExperience.comment];
+                values = [Constants.WorkExperience.company, Constants.WorkExperience.jobTitle, Constants.WorkExperience.fromDate, Constants.WorkExperience.toDate, Constants.WorkExperience.comment];
+                break;
+            case "education":
+                locators = [this.education.institute, this.education.majorOrSpecialization, this.education.year, this.education.gpaScore, this.education.startDate, this.education.endDate];
+                values = [Constants.Education.institute, Constants.Education.majorOrSpecialization, Constants.Education.year, Constants.Education.gpaScore, Constants.Education.startDate, Constants.Education.endDate];
+                break;
+            case "skills":
+                locators = [this.skills.yearsOfExperience, this.skills.comment];
+                values = [Constants.Skills.yearsOfExperience, Constants.Skills.comment];
+                break;
+            case "licenseDetails":
+                locators = [this.license.licenseNumber, this.license.issuedDate, this.license.expiryDate];
+                values = [Constants.License.licenseNumber, Constants.License.issuedDate, Constants.License.expiryDate];
+                break;
+            case "AssigenedMemberships":
+                locators = [this.memberships.subscriptionAmount, this.memberships.subscriptionCommenceDate, this.memberships.subscriptionRenewalDate];
+                values = [Constants.AssignedMemberships.subscriptionAmount, Constants.AssignedMemberships.subscriptionCommenceDate, Constants.AssignedMemberships.subscriptionRenewalDate];
+                break;
+        }
+        return { locators, values };
+    }
 }

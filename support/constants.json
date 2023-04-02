@@ -27,7 +27,8 @@
         "otherId": "11",
         "driverLicenseNumber": "123",
         "ssnNumber": "110",
-        "sinNumber": "111"
+        "sinNumber": "111",
+        "licenseExpiryDate": "2024-01-10"
     },
     "EmployeeContactDetails": {
         "street1": "KLS",
@@ -48,6 +49,43 @@
         "mobile": "777777777",
         "workTelephone": "77777776"
     },
+    "ImmigrationDetails": {
+        "issuedDate": "2023-03-10",
+        "expiryDate": "2023-03-28",
+        "eligibleStatus": "Active",
+        "eligibleReviewDate": "2023-03-28",
+        "comments": "Immigration details has been filled",
+        "number": "1234567"
+    },
+    "WorkExperience": {
+        "company": "AM",
+        "jobTitle": "Software Engineer",
+        "fromDate": "2019-02-23",
+        "toDate": "2025-02-23",
+        "comment": "Filled Work Experience fields"
+    },
+    "Education": {
+        "institute": "STC",
+        "majorOrSpecialization": "BSC",
+        "year": "2015",
+        "gpaScore": "7.2",
+        "startDate": "2012-04-15",
+        "endDate": "2015-04-15"
+    },
+    "Skills": {
+        "yearsOfExperience": "4",
+        "comment": "Filled Skills fields"
+    },
+    "License": {
+        "licenseNumber": "123456",
+        "issuedDate": "2015-04-15",
+        "expiryDate": "2015-05-15"
+    },
+    "AssignedMemberships": {
+        "subscriptionAmount": "42000",
+        "subscriptionCommenceDate": "2023-03-21",
+        "subscriptionRenewalDate": "2023-03-23"
+    },
     "sucessMsg": {
         "successfulUpdatedMsg": "Successfully Updated",
         "successfulDeletedMsg": "Successfully Deleted",
@@ -55,7 +93,7 @@
         "sucessfulActivatedMsg": "Successfully Activated",
         "sucessfulSubmittedMsg": "Timesheet Submitted"
     },
-    "others":{
+    "others": {
         "minimizeIconClass": "bi-fullscreen-exit",
         "maximizeIconClass": "bi-arrows-fullscreen"
     },

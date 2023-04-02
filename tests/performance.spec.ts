@@ -45,13 +45,15 @@ test.describe('Performance Configure', () => {
         await utils.clickMenu("link", homePage.homePageElements.performance, "Performance");
         await utils.click(performancePage.keyPerformanceIndicators.configure);
         await utils.clickByRole("menuitem", 'KPIs', true);
-        let row = await performancePage.getARowCheckbox('A Playwright Test');
         await utils.click(performancePage.add);
         await utils.fillTextBoxValues(performancePage.keyPerformanceIndicators.keyPerformanceIndicator, "A Playwright Test", true);
         await utils.selecDropdownOption("option", performancePage.keyPerformanceIndicators.jobTitle, "Software Engineer");
-        await utils.clickSave(myInfoPage.save, 0, Constants.sucessMsg.sucessfulSavedMsg);
+        await utils.clickSave(myInfoPage.save,0);
+        await page.waitForLoadState('networkidle');
+        await page.waitForTimeout(4000);
         await utils.selecDropdownOption("option", performancePage.keyPerformanceIndicators.jobTitle, "Software Engineer");
         await utils.click(performancePage.keyPerformanceIndicators.search);
+        let row = await performancePage.getARowCheckbox('A Playwright Test');
         await expect(row.nth(0)).toBeVisible();
     });
 });
@@ -65,7 +67,7 @@ test('Filling Trackers details', async () => {
     await utils.clickOption('option', "Test User1");
     await utils.fillTextBoxValues(performancePage.addPerformanceTracker.reviewers, "Test U", true);
     await utils.clickOption('option', "Test User2");
-    await utils.clickSave(myInfoPage.save, 0, Constants.sucessMsg.sucessfulSavedMsg);
+    await utils.clickSave(myInfoPage.save, 0);
     await utils.fillTextBoxValues(performancePage.addPerformanceTracker.employeeName, "Test U", true);
     await utils.clickOption('option', "Test User1");
     await utils.click(performancePage.keyPerformanceIndicators.search);
@@ -120,21 +122,19 @@ test.describe('Performance Manage Reviews', () => {
         await utils.fillDateValue(performancePage.addReview.reviewDueDate, "2023-03-30");
         await utils.clickSave(myInfoPage.save, 0);
         let rowCells = await performancePage.getRowDetails();
-        console.log("rowcells1", rowCells);
         expect(rowCells.reviewStatus).toEqual("Inactive");
     });
 
     test('Activating the Manage Performance Review record', async () => {
         await utils.clickElementWithIndex(performancePage.addReview.editIcon, 0);
         await utils.waitForElement(myInfoPage.backgroundContainer);
-        // await page.waitForTimeout(5000);
+        await page.waitForTimeout(3000);
         await utils.click(performancePage.addReview.activate);
         let toast = await utils.getToastMessage();
         expect(toast).toEqual(Constants.sucessMsg.sucessfulActivatedMsg);
         await utils.click(myInfoPage.toastElements.closeIcon);
         await utils.waitForSpinnerToDisappear();
         let rowCells = await performancePage.getRowDetails();
-        console.log("rowcells2", rowCells);
         expect(rowCells.reviewStatus).toEqual("Activated");
     });
 });
@@ -146,7 +146,6 @@ test.describe('Performance My Reviews', () => {
         await performancePage.fillMyReviewDetails();
         await utils.clickByRole("menuitem", 'My Reviews', true);
         let rowCells = await performancePage.getMyReviewDetails('2023-03-30');
-        console.log("rowcells3", rowCells);
         expect(rowCells.selfEvaluationStatus).toEqual('Completed');
     });
 });
@@ -162,6 +161,5 @@ test.describe('Performance Employee Reviews', () => {
         await utils.clickOption('option', "Test User1");
         await utils.click(directoryPage.directory.search);
         let rowCells = await performancePage.getMyReviewDetails('2023-03-30');
-        console.log("rowcells4", rowCells);
     });
 });

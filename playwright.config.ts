@@ -24,7 +24,7 @@ const RPconfig = {
 
 export default defineConfig({
   testDir: './tests',
-  testMatch: ["tests/myInfo.spec.ts"],
+  testMatch: ["tests/time.spec.ts"],
   timeout: 60 * 60 * 1000,
   expect: {
     timeout: 10000

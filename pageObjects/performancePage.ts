@@ -168,10 +168,8 @@ export class PerformancePage {
 
     //This function is used to get a Add review Row Details
     async getRowDetails() {
-        // let sd = await this.getARow();
         await this.page.waitForSelector(this.addReview.tableRow);
         let cells = await this.page.locator(this.addReview.tableRowCells).allTextContents();
-        console.log("getRowDetails", cells);
         return {
             employee: cells[1],
             jobTitle: cells[2],
@@ -184,10 +182,8 @@ export class PerformancePage {
 
     //This function is used to get a My Review Row Details
     async getMyReviewDetails(columnValue) {
-        // let row = await this.getARow(columnValue);
         await this.page.waitForSelector(this.addReview.tableRow);
         let rowCellValues = await this.page.locator(this.getRowCells(columnValue)).allTextContents();
-        console.log("rowCellValues", rowCellValues);
         return {
             jobTitle: rowCellValues[0],
             subUnit: rowCellValues[1],
@@ -201,11 +197,9 @@ export class PerformancePage {
     //This function is used to get a fill the My Review Details
     async fillMyReviewDetails() {
         let dueDate = await utils.isElementVisible(this.myReview.dueDate);
-        console.log("dueDate", dueDate);
         expect(dueDate).toBeTruthy();
         await utils.clickElementWithIndex(this.myReview.fileIcon, 0);
         for (let i = 0; i < 5; i++) {
-            console.log("iteration", i);
             await this.page.locator(this.myReview.ratingField).nth(i).fill('90');
             await this.page.locator(this.myReview.commentsField).nth(i).fill('Good Performance');
         }
