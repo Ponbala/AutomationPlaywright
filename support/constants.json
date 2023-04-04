@@ -155,7 +155,8 @@
         "successfulDeletedMsg": "Successfully Deleted",
         "sucessfulSavedMsg": "Successfully Saved",
         "sucessfulActivatedMsg": "Successfully Activated",
-        "sucessfulSubmittedMsg": "Timesheet Submitted"
+        "sucessfulSubmittedMsg": "Timesheet Submitted",
+        "germansuccessfulUpdatedMsg": "Aktualisiert"
     },
     "others": {
         "minimizeIconClass": "bi-fullscreen-exit",
@@ -227,7 +228,21 @@
         "comment": "Text file has been uploaded"
     },
     "popupText": {
-        "text": "The selected record will be permanently deleted. Are you sure you want to continue?"
+        "text": "The selected record will be permanently deleted. Are you sure you want to continue?",
+        "purge": "You are about to purge selected candidates permanently. Are you sure you want to continue? This operation cannot be undone",
+        "item": "The selected item will be permanently deleted. Are you sure you want to continue?"
+    },
+    "assertion": {
+        "invalidCredentials": "Invalid credentials",
+        "requiredCredentials": "Required",
+        "success": "Successfully Saved",
+        "totalRecords": "(1) Record Found",
+        "status1": "Status: Shortlisted",
+        "status2": "Status: Rejected",
+        "scheduled": "Status: Interview Scheduled",
+        "markInterview": "Status: Interview Passed",
+        "offerJob": "Status: Job Offered",
+        "hired": "Status: Hired"
     },
     "Users": {
         "firstNameUser1": "Test",

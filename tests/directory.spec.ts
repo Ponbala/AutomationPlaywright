@@ -3,7 +3,7 @@ import { Utils } from '../support/utils';
 import { TestData } from '../testData/testData';
 import Constants from '../support/constants.json';
 import { LoginPage, HomePage, DirectoryPage } from '../pageObjects';
-import ENV from '../support/env';
+import ENV from "../support/env";
 
 let loginPage: LoginPage, homePage: HomePage, directoryPage: DirectoryPage, testData: TestData, page: Page, utils: Utils;
 
@@ -37,7 +37,9 @@ test.describe('Directory', () => {
         await utils.selecDropdownOption(Constants.Roles.option, directoryPage.directory.location, Constants.others.jobLocation);
         await utils.click(directoryPage.directory.search);
         await utils.waitForSpinnerToDisappear();
-        expect(await (await directoryPage.getRecordsCount()).trim()).toEqual(Constants.recordsCount);
-        expect(await (await directoryPage.getEmployeeName()).trim()).toEqual(Constants.Users.employeeNameUser1Space);
+        let recordCount = await directoryPage.getRecordsCount();
+        expect(recordCount?.trim()).toEqual(Constants.recordsCount);
+        let employeeName = await directoryPage.getEmployeeName();
+        expect(employeeName?.trim()).toEqual(Constants.Users.employeeNameUser1Space);
     });
 });

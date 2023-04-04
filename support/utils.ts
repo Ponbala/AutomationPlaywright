@@ -1,7 +1,7 @@
 import { chromium, firefox, webkit, Page, expect } from '@playwright/test';
 import { HomePage } from '../pageObjects';
 import { DirectoryPage } from "../pageObjects/directoryPage";
-import Constants from "../support/constants.json";
+import Constants from "./constants.json";
 
 let directoryPage: DirectoryPage;
 let homePage: HomePage;
@@ -97,7 +97,7 @@ export class Utils {
   }
 
   // This function is used to get the element
-  async getElement(locator) {
+  async getElement(locator: string) {
     return this.page.locator(locator);
   }
 
@@ -149,7 +149,7 @@ export class Utils {
   }
 
   // This function is used to "click on the element with index"
-  async clickElementWithIndex(locatorValue, index) {
+  async clickElementWithIndex(locatorValue: string, index: number) {
     await this.page.locator(locatorValue).nth(index).click();
   }
 
@@ -174,14 +174,14 @@ export class Utils {
   }
 
   // This function is used to "copy and paste" the values from the any textbox elements
-  async copyPaste(sourceLocator, destinationLocator) {
+  async copyPaste(sourceLocator: string, destinationLocator: string) {
     await this.page.locator(sourceLocator).dblclick();
     await this.page.locator(sourceLocator).press(Constants.ctrlC);
     await this.page.locator(destinationLocator).press(Constants.ctrlV);
   }
 
   // This function is used to "get the text" of any elements
-  async getText(locator) {
+  async getText(locator: string) {
     return await this.page.locator(locator).textContent();
   }
 
@@ -191,7 +191,7 @@ export class Utils {
   }
 
   // This function is used to "click the element/link"
-  async clickByRole(role, value, shouldWaitForContainer?: boolean) {
+  async clickByRole(role: any, value: any, shouldWaitForContainer?: boolean) {
     await this.page.getByRole(role, { name: value, exact: true }).click();
     if (shouldWaitForContainer) {
       await this.page.waitForSelector(this.backgroundContainer);
@@ -200,40 +200,48 @@ export class Utils {
   }
 
   // This function is used to "select the option" from "Auto suggestion"
-  async clickOption(role, value) {
+  async clickOption(role: any, value: string | RegExp) {
     await this.page.getByRole(role, { name: value }).getByText(value, { exact: true }).click();
   }
 
   // This function is used to "click on the My info sub menus"
-  async clickMenu(role, locator, menuLinkText) {
+  async clickMenu(role: any, locator: any, menuLinkText: string) {
     await this.page.waitForSelector(locator);
     await this.page.getByRole(role, { name: menuLinkText }).click();
     await (await this.page.waitForSelector(this.backgroundContainer)).waitForElementState("stable");
+    await this.page.waitForLoadState("domcontentloaded", { timeout: 12000 });
     await this.page.waitForLoadState("networkidle", { timeout: 10000 });
   }
 
-  async waitForElement(locator) {
+   // This function is used to wait for the element
+  async waitForElement(locator: string) {
     await (await this.page.waitForSelector(locator)).waitForElementState("stable");
   }
 
+  // This function is used to delete users
   async deleteUsers() {
     await this.clickMenu(Constants.Roles.link, homePage.homePageElements.pim, Constants.Menu.pim);
     await this.click(this.employeeListMenu);
     await this.fillTextBoxValues(directoryPage.directory.employeeName, Constants.Users.employeeToSearch, true);
     await this.page.locator(directoryPage.directory.search).click();
+    let noRecordsCloseIcon = await this.page.locator(this.toastElements.closeIcon).isVisible();
+    if (noRecordsCloseIcon) {
+      await this.clickCloseIcon();
+    }
     await this.waitForElement(this.tableContainer);
-    await this.page.waitForTimeout(5000);
+    await this.page.waitForTimeout(3000);
     let tableRow = await (this.page.locator(this.row(Constants.Users.firstNameUser1))).first().isVisible();
     if (tableRow) {
       await this.deleteRecords(Constants.Users.firstNameUser1);
     }
   }
 
-  async deleteRecords(value) {
+   // This function is used to delete records
+  async deleteRecords(value: string) {
     let rowVisibility = await this.page.locator(this.tableRow).first().isVisible();
+    let rows = await this.getARow(Constants.Users.firstNameUser1);
+    let rowsCount = await rows.count();
     if (rowVisibility) {
-      let rows = await this.getARow(Constants.Users.firstNameUser1);
-      let rowsCount = await rows.count();
       for (let i = 0; i < rowsCount; i++) {
         let get = await this.getARow(value);
         await get.locator(this.trashPath).first().click();
@@ -248,12 +256,12 @@ export class Utils {
   }
 
   // This function is used to get the "specific row"
-  async getARow(value) {
+  async getARow(value: string) {
     await this.page.waitForSelector(this.row(value));
     return this.page.locator(this.row(value));
   }
 
-    // This function is used for Create user
+  // This function is used for Create user
   async createUsers(firstName, lastName, userName) {
     await this.clickMenu(Constants.Roles.link, homePage.homePageElements.pim, Constants.Menu.pim);
     await this.click(this.addEmployee);
@@ -270,21 +278,22 @@ export class Utils {
     await this.waitForElement(this.backgroundContainer);
     await this.page.waitForLoadState("networkidle", { timeout: 15000 });
     await this.click(this.job);
-    await this.page.waitForLoadState("networkidle", { timeout: 15000 });
+    await this.waitForSpinnerToDisappear();
     await this.fillDateValue(this.joinedDate, Constants.Dates.joinedDate);
     await this.selecDropdownOption(Constants.Roles.option, this.jobTitle, Constants.others.jobTitleSE);
     await this.selecDropdownOption(Constants.Roles.option, this.location, Constants.others.jobLocation);
     await this.clickSave(this.save, 0);
   }
 
-   // This function is used for updating the role
+  // This function is used for updating the role
   async updatingUserRole(userName, userRole) {
     await this.clickMenu(Constants.Roles.link, homePage.homePageElements.admin, userRole);
     await this.fillTextBoxValues(this.userName, userName, true);
     await this.click(this.search);
     await this.waitForElement(this.row(userName));
     await this.click(this.editIcon);
-    await this.page.waitForLoadState("networkidle", { timeout: 10000 });
+    await this.page.waitForLoadState("domcontentloaded", { timeout: 12000 });
+    await this.page.waitForLoadState("networkidle", { timeout: 12000 });
     await this.waitForElement(this.backgroundContainer);
     await this.selecDropdownOption(Constants.Roles.option, this.userRole, Constants.others.reportingMethodAdmin);
     await this.clickSave(this.save, 0);

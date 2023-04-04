@@ -126,9 +126,9 @@ test.describe('Time Reports', () => {
         await timePage.searchAndViewReports(Constants.Menu.employeeReports, timePage.timeElements.employeeName, Constants.Users.firstNameUser1, Constants.Users.employeeNameUser1);
         await utils.waitForElement(timePage.reports.reportsTableContainer);
         await utils.isElementVisible(timePage.reports.employeeReportsTable);
-        let minimizeIcon = await timePage.maximizeMinimizeReports(timePage.reports.maximize, timePage.reports.minimize);
+        let minimizeIcon:any = await timePage.maximizeMinimizeReports(timePage.reports.maximize, timePage.reports.minimize);
         expect(minimizeIcon.includes(Constants.others.minimizeIconClass)).toBeTruthy();
-        let maximizeIcon = await timePage.maximizeMinimizeReports(timePage.reports.minimize, timePage.reports.maximize);
+        let maximizeIcon:any = await timePage.maximizeMinimizeReports(timePage.reports.minimize, timePage.reports.maximize);
         expect(maximizeIcon.includes(Constants.others.maximizeIconClass)).toBeTruthy();
     });
 
